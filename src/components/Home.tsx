@@ -1,8 +1,7 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import type { HomeIngredientAnimation } from "../types/homeScreen";
-import { Search } from "lucide-react";
 import apple from "../assets/ingredients/apple-svgrepo-com.svg";
 import banana from "../assets/ingredients/banana-svgrepo-com.svg";
 import carrot from "../assets/ingredients/carrot-svgrepo-com.svg";
@@ -21,34 +20,53 @@ import pumpkin from "../assets/ingredients/pumpkin-svgrepo-com.svg";
 import roast from "../assets/ingredients/roast-chicken-chicken-svgrepo-com.svg";
 import strawberry from "../assets/ingredients/strawberry-svgrepo-com.svg";
 import watermelon from "../assets/ingredients/watermelon-diet-svgrepo-com.svg";
+import Navbar from "./Navbar";
 
-const Home = () => {
+interface HomeProps {
+  searchQuery?: string;
+  selectedCountry?: string;
+  selectedRegion?: string;
+  onSearchChange?: (query: string) => void;
+  onCountryChange?: (country: string) => void;
+  onRegionChange?: (region: string) => void;
+}
+
+const Home = ({
+  searchQuery = "",
+  selectedCountry = "",
+  selectedRegion = "",
+  onSearchChange,
+  onCountryChange,
+  onRegionChange,
+}: HomeProps) => {
   const brandName = useRef<HTMLHeadingElement>(null);
   const initialAnimationContainer = useRef<HTMLDivElement>(null);
-  const navSection = useRef<HTMLBaseElement>(null);
   const [droppingIngredients, setDroppingIngredients] =
     useState<HomeIngredientAnimation[]>();
 
-  const ingredients = [
-    apple,
-    banana,
-    carrot,
-    chicken,
-    chicken1,
-    corn,
-    friedEgg,
-    grapes,
-    hamburger,
-    honey,
-    lemon,
-    peach,
-    pear,
-    potato,
-    pumpkin,
-    roast,
-    strawberry,
-    watermelon,
-  ];
+  const ingredients = useMemo(
+    () => [
+      apple,
+      banana,
+      carrot,
+      chicken,
+      chicken1,
+      corn,
+      friedEgg,
+      grapes,
+      hamburger,
+      honey,
+      lemon,
+      peach,
+      pear,
+      potato,
+      pumpkin,
+      roast,
+      strawberry,
+      watermelon,
+    ],
+    [],
+  );
   gsap.registerPlugin(useGSAP);
 
   useEffect(() => {
@@ -64,7 +82,7 @@ const Home = () => {
     }
 
     setDroppingIngredients(fruitDroppings);
-  }, []);
+  }, [ingredients]);
 
   useGSAP(
     () => {
@@ -103,12 +121,6 @@ const Home = () => {
         },
       );
 
-      //   Navbar animation
-      gsap.from(navSection.current, {
-        autoAlpha: 1,
-        delay: 2,
-      });
-
       droppingIngredients?.forEach((fruit) => {
         const dropElement = document.getElementById(`fruit-${fruit.id}`);
         if (dropElement) {
@@ -143,34 +155,14 @@ const Home = () => {
 
   return (
     <section className="">
-      <nav
-        ref={navSection}
-        className="relative flex items-center justify-between border-b border-gray-100 bg-gray-50 px-10 py-5"
-      >
-        <h1 className="text-xl font-bold uppercase italic">
-          <span className="text-red-500">FO</span>
-          <span className="text-orange-500">OD</span>
-          <span className="text-yellow-500"> C</span>
-          <span className="text-green-500">EN</span>
-          <span className="text-blue-500">TE</span>
-          <span className="text-purple-500">R</span>
-        </h1>
-        <div className="flex items-center justify-center gap-10">
-          <button className="text-gray-500 hover:cursor-pointer hover:text-gray-700 hover:underline">
-            Country
-          </button>
-          <button className="text-gray-500 hover:cursor-pointer hover:text-gray-700 hover:underline">
-            Region
-          </button>
-        </div>
-        <div className="flex items-center justify-center gap-1 rounded-lg text-gray-700 hover:cursor-pointer hover:text-gray-500 hover:underline">
-          <p>Search</p>
-          <Search className="right-2 text-gray-700" height={20} width={20} />
-        </div>
-
-        {/* Search Modal */}
-        <form action=""></form>
-      </nav>
+      <Navbar
+        searchQuery={searchQuery}
+        selectedCountry={selectedCountry}
+        selectedRegion={selectedRegion}
+        onSearchChange={onSearchChange}
+        onCountryChange={onCountryChange}
+        onRegionChange={onRegionChange}
+      />
       <div
         ref={initialAnimationContainer}
         className="relative flex h-screen w-screen items-center justify-center gap-3 overflow-hidden"
@@ -190,7 +182,7 @@ const Home = () => {
             width={50}
           />
         ))}
-        <h1 className="z-10 text-7xl font-black uppercase" ref={brandName}>
+        <h1 className="z-10 text-5xl lg:text-7xl font-black uppercase" ref={brandName}>
           <span className="text-red-500">FO</span>
           <span className="text-orange-500">OD</span>
           <span className="text-yellow-500"> C</span>
@@ -198,6 +190,32 @@ const Home = () => {
           <span className="text-blue-500">TE</span>
           <span className="text-purple-500">R</span>
         </h1>
+
+        {/* Display search and filter values */}
+        {(searchQuery || selectedCountry || selectedRegion) && (
+          <div className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2 transform rounded-2xl border border-white/30 bg-white/20 p-4 backdrop-blur-sm">
+            <div className="text-center text-gray-800">
+              {searchQuery && (
+                <p className="mb-1 text-sm">
+                  🔍 Search:{" "}
+                  <span className="font-semibold">{searchQuery}</span>
+                </p>
+              )}
+              {selectedCountry && (
+                <p className="mb-1 text-sm">
+                  🌍 Country:{" "}
+                  <span className="font-semibold">{selectedCountry}</span>
+                </p>
+              )}
+              {selectedRegion && (
+                <p className="text-sm">
+                  🗺️ Region:{" "}
+                  <span className="font-semibold">{selectedRegion}</span>
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
