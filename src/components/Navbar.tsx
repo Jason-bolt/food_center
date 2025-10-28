@@ -21,33 +21,43 @@ const Navbar = ({
   onRegionChange,
 }: NavbarProps) => {
   const navSection = useRef<HTMLBaseElement>(null);
+  const searchModalRef = useRef<HTMLDivElement>(null);
+  const selectCountryModalRef = useRef<HTMLDivElement>(null);
+  const selectCountryModalBackgroundRef = useRef<HTMLDivElement>(null);
+  const selectRegionModalBackgroundRef = useRef<HTMLDivElement>(null);
+  const selectRegionModalRef = useRef<HTMLDivElement>(null);
+  const searchModalBackgroundRef = useRef<HTMLDivElement>(null);
+  const searchButtonRef = useRef<HTMLDivElement>(null);
+  const selectCountryButtonRef = useRef<HTMLButtonElement>(null);
+  const selectRegionButtonRef = useRef<HTMLButtonElement>(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
 
-  // Dummy data for countries and regions
+  // Countries list
   const countries = [
     "United States",
     "Canada",
     "United Kingdom",
     "France",
     "Germany",
-    "Italy",
     "Spain",
+    "Italy",
     "Japan",
     "China",
     "India",
-    "Brazil",
-    "Mexico",
     "Australia",
+    "Mexico",
+    "Brazil",
+    "Argentina",
     "South Korea",
     "Thailand",
-    "Vietnam",
     "Greece",
     "Turkey",
   ];
 
+  // Regions list
   const regions = [
     "North America",
     "South America",
@@ -56,9 +66,9 @@ const Navbar = ({
     "Africa",
     "Oceania",
     "Middle East",
-    "Caribbean",
     "Mediterranean",
     "Scandinavia",
+    "Caribbean",
   ];
 
   useGSAP(
@@ -78,6 +88,64 @@ const Navbar = ({
     { dependencies: [] },
   );
 
+  // Animate modal when it opens
+  useGSAP(
+    () => {
+      if (isSearchModalOpen && searchModalRef.current) {
+        const tl = gsap.timeline();
+        tl.from(searchModalRef.current, {
+          y: -40,
+          opacity: 0,
+        });
+        tl.from(searchModalBackgroundRef.current, {
+          opacity: 0,
+          duration: 0.5,
+        });
+      }
+    },
+    {
+      dependencies: [isSearchModalOpen],
+    },
+  );
+
+  useGSAP(
+    () => {
+      if (isCountryModalOpen && selectCountryButtonRef.current) {
+        const tl = gsap.timeline();
+        tl.from(selectCountryModalRef.current, {
+          y: -40,
+          opacity: 0,
+        });
+        tl.from(selectCountryModalBackgroundRef.current, {
+          opacity: 0,
+          duration: 0.5,
+        });
+      }
+    },
+    {
+      dependencies: [isCountryModalOpen],
+    },
+  );
+
+  useGSAP(
+    () => {
+      if (isRegionModalOpen && selectRegionButtonRef.current) {
+        const tl = gsap.timeline();
+        tl.from(selectRegionModalRef.current, {
+          y: -40,
+          opacity: 0,
+        });
+        tl.from(selectRegionModalBackgroundRef.current, {
+          opacity: 0,
+          duration: 0.5,
+        });
+      }
+    },
+    {
+      dependencies: [isRegionModalOpen],
+    },
+  );
+
   return (
     <nav
       ref={navSection}
@@ -94,12 +162,14 @@ const Navbar = ({
         </h1>
         <div className="hidden items-center justify-center gap-10 md:flex">
           <button
-            className="text-sm text-gray-500 hover:cursor-pointer hover:text-gray-700 hover:underline"
+            ref={selectCountryButtonRef}
+            className="p-1 text-sm text-gray-500 hover:cursor-pointer hover:text-gray-700 hover:underline"
             onClick={() => setIsCountryModalOpen(true)}
           >
             {selectedCountry || "Country"}
           </button>
           <button
+            ref={selectRegionButtonRef}
             className="text-sm text-gray-500 hover:cursor-pointer hover:text-gray-700 hover:underline"
             onClick={() => setIsRegionModalOpen(true)}
           >
@@ -107,7 +177,8 @@ const Navbar = ({
           </button>
         </div>
         <div
-          className="flex items-center justify-center gap-1 rounded-lg text-gray-700 hover:cursor-pointer hover:text-gray-500 hover:underline"
+          ref={searchButtonRef}
+          className="flex items-center justify-center gap-1 rounded-lg p-1 text-gray-700 hover:cursor-pointer hover:text-gray-500 hover:underline"
           onClick={() => setIsSearchModalOpen(true)}
         >
           <p className="text-sm">Search</p>
@@ -131,11 +202,15 @@ const Navbar = ({
 
       {/* Search Modal */}
       {isSearchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16">
+        <div
+          ref={searchModalRef}
+          className="fixed inset-0 z-50 flex items-start justify-center pt-28"
+        >
           {/* Backdrop with blur effect */}
           <div
             className="absolute inset-0 bg-black/10 backdrop-blur-md"
             onClick={() => setIsSearchModalOpen(false)}
+            ref={searchModalBackgroundRef}
           />
 
           {/* Modal Container */}
@@ -212,8 +287,12 @@ const Navbar = ({
 
       {/* Country Selection Modal */}
       {isCountryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16">
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-28"
+          ref={selectCountryModalRef}
+        >
           <div
+            ref={selectCountryModalBackgroundRef}
             className="absolute inset-0 bg-black/10 backdrop-blur-md"
             onClick={() => setIsCountryModalOpen(false)}
           />
@@ -274,8 +353,12 @@ const Navbar = ({
 
       {/* Region Selection Modal */}
       {isRegionModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16">
+        <div
+          ref={selectRegionModalRef}
+          className="fixed inset-0 z-50 flex items-start justify-center pt-28"
+        >
           <div
+            ref={selectRegionModalBackgroundRef}
             className="absolute inset-0 bg-black/10 backdrop-blur-md"
             onClick={() => setIsRegionModalOpen(false)}
           />
