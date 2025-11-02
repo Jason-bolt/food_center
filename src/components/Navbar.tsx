@@ -2,6 +2,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Search, X } from "lucide-react";
 import { useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 interface NavbarProps {
   searchQuery?: string;
@@ -34,6 +35,9 @@ const Navbar = ({
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+  const location = useLocation();
+
+  const currentPath = location.pathname;
 
   // Countries list
   const countries = [
@@ -74,18 +78,20 @@ const Navbar = ({
   useGSAP(
     () => {
       //   Navbar animation
-      gsap.fromTo(
-        navSection.current,
-        {
-          autoAlpha: 0,
-        },
-        {
-          autoAlpha: 1,
-          delay: 2,
-        },
-      );
+      if (currentPath === "/") {
+        gsap.fromTo(
+          navSection.current,
+          {
+            autoAlpha: 0,
+          },
+          {
+            autoAlpha: 1,
+            delay: 2,
+          },
+        );
+      }
     },
-    { dependencies: [] },
+    { dependencies: [currentPath] },
   );
 
   // Animate modal when it opens
@@ -152,14 +158,17 @@ const Navbar = ({
       className="relative flex flex-col border-b border-gray-100 bg-gray-50"
     >
       <section className="flex items-center justify-between px-10 py-5">
-        <h1 className="text-xl font-bold uppercase italic">
+        <Link
+          to={"/"}
+          className="text-xl font-bold uppercase italic transition-all duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-80"
+        >
           <span className="text-red-500">FO</span>
           <span className="text-orange-500">OD</span>
           <span className="text-yellow-500"> C</span>
           <span className="text-green-500">EN</span>
           <span className="text-blue-500">TE</span>
           <span className="text-purple-500">R</span>
-        </h1>
+        </Link>
         <div className="hidden items-center justify-center gap-10 md:flex">
           <button
             ref={selectCountryButtonRef}
