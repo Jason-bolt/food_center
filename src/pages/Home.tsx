@@ -172,8 +172,6 @@ const Home = () => {
   const brandName = useRef<HTMLHeadingElement>(null);
   const initialAnimationContainer = useRef<HTMLDivElement>(null);
 
-  gsap.registerPlugin(useGSAP);
-
   useEffect(() => {
     const fruitDroppings: HomeIngredientAnimation[] = [];
     for (let i = 0; i < ingredients.length; i++) {

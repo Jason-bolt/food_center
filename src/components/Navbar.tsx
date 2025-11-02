@@ -158,7 +158,10 @@ const Navbar = ({
       className="relative flex flex-col border-b border-gray-100 bg-gray-50"
     >
       <section className="flex items-center justify-between px-10 py-5">
-        <Link to={"/"} className="text-xl font-bold uppercase italic">
+        <Link
+          to={"/"}
+          className="text-xl font-bold uppercase italic transition-all duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-80"
+        >
           <span className="text-red-500">FO</span>
           <span className="text-orange-500">OD</span>
           <span className="text-yellow-500"> C</span>
