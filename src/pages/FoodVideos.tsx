@@ -3,8 +3,11 @@ import FoodVideoCard from "../components/FoodVideoCard";
 import { ArrowLeft } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import FoodVideoPlayer from "../components/FoodVideoPlayer";
+import { useState } from "react";
 
 const FoodVideos = () => {
+  const [isVideoPlayeropen, setIsVideoPlayeropen] = useState<boolean>(false);
   useGSAP(() => {
     gsap.from(".foodVideoCard", {
       y: 300,
@@ -14,6 +17,10 @@ const FoodVideos = () => {
       stagger: 0.1,
     });
   });
+
+  const toggleVideoPlayer = (value: boolean) => {
+    setIsVideoPlayeropen(value);
+  };
 
   return (
     <section className="min-h-screen pt-2">
@@ -26,13 +33,34 @@ const FoodVideos = () => {
       </Link>
       <h1 className="mb-5 text-center text-3xl font-bold">Food Name</h1>
       <div className="flex w-full flex-wrap items-center justify-center gap-5">
-        <FoodVideoCard className="foodVideoCard" />
-        <FoodVideoCard className="foodVideoCard" />
-        <FoodVideoCard className="foodVideoCard" />
-        <FoodVideoCard className="foodVideoCard" />
-        <FoodVideoCard className="foodVideoCard" />
-        <FoodVideoCard className="foodVideoCard" />
+        <FoodVideoCard
+          toggleVideoPlayer={toggleVideoPlayer}
+          className="foodVideoCard"
+        />
+        <FoodVideoCard
+          toggleVideoPlayer={toggleVideoPlayer}
+          className="foodVideoCard"
+        />
+        <FoodVideoCard
+          toggleVideoPlayer={toggleVideoPlayer}
+          className="foodVideoCard"
+        />
+        <FoodVideoCard
+          toggleVideoPlayer={toggleVideoPlayer}
+          className="foodVideoCard"
+        />
+        <FoodVideoCard
+          toggleVideoPlayer={toggleVideoPlayer}
+          className="foodVideoCard"
+        />
+        <FoodVideoCard
+          toggleVideoPlayer={toggleVideoPlayer}
+          className="foodVideoCard"
+        />
       </div>
+      {isVideoPlayeropen && (
+        <FoodVideoPlayer toggleVideoPlayer={toggleVideoPlayer} />
+      )}
     </section>
   );
 };

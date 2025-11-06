@@ -108,14 +108,14 @@ const Navbar = ({ searchQuery = "", onSearchChange }: NavbarProps) => {
           <div className="relative mx-4 w-full max-w-md">
             {/* Glass Container */}
             <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
-            <div className="absolute inset-0 bg-gray-200 opacity-90" />
+              <div className="absolute inset-0 bg-gray-200 opacity-90" />
 
               {/* Content */}
               <div className="relative p-8">
                 {/* Close button */}
                 <button
                   onClick={() => setIsSearchModalOpen(false)}
-                  className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-all duration-200 hover:bg-white/10 hover:text-gray-600"
+                  className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-all duration-200 hover:cursor-pointer hover:bg-white/10 hover:text-gray-600"
                 >
                   <X size={20} />
                 </button>
