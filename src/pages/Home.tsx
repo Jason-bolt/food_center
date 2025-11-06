@@ -21,6 +21,7 @@ import strawberry from "../assets/ingredients/strawberry-svgrepo-com.svg";
 import watermelon from "../assets/ingredients/watermelon-diet-svgrepo-com.svg";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { HomeIngredientAnimation } from "../types/homeScreen";
+import CountryRegionFilter from "../components/CountryRegionFilter";
 
 const Home = () => {
   const ingredients = useMemo(
@@ -170,7 +171,7 @@ const Home = () => {
     useState<HomeIngredientAnimation[]>();
 
   const brandName = useRef<HTMLHeadingElement>(null);
-  const initialAnimationContainer = useRef<HTMLDivElement>(null);
+  const initialAnimationContainer = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const fruitDroppings: HomeIngredientAnimation[] = [];
@@ -189,6 +190,9 @@ const Home = () => {
 
   useGSAP(
     () => {
+      gsap.set(".countryRegionFilter", {
+        autoAlpha: 0,
+      });
       // Brand name animation
       const brandTl = gsap.timeline();
       brandTl
@@ -220,6 +224,9 @@ const Home = () => {
           duration: 1,
           ease: "power1",
           autoAlpha: 0,
+        })
+        .to(".countryRegionFilter", {
+          autoAlpha: 1,
         });
 
       // Dropping ingredients animation
@@ -255,7 +262,7 @@ const Home = () => {
 
   useGSAP(() => {
     gsap.from(foodCardSectionRef.current, {
-      opacity: 0,
+      autoAlpha: 0,
       y: 50,
       duration: 1,
       delay: 5,
@@ -263,12 +270,10 @@ const Home = () => {
   }, {});
 
   return (
-    <section className="min-h-screen p-2">
-      <section className="fixed">
-        <div
-          ref={initialAnimationContainer}
-          className="relative flex h-screen w-screen items-center justify-center gap-3 overflow-hidden"
-        >
+    <section className="min-h-screen pt-2" ref={initialAnimationContainer}>
+      <CountryRegionFilter className="countryRegionFilter" />
+      <section className="fixed inset-0 mt-30">
+        <div className="relative flex h-screen w-screen items-center justify-center gap-3 overflow-hidden">
           {droppingIngredients?.map((fruit) => (
             <img
               key={fruit.id}
@@ -285,7 +290,7 @@ const Home = () => {
             />
           ))}
           <h1
-            className="z-10 text-5xl font-black uppercase lg:text-7xl"
+            className="z-10 mx-auto text-center text-5xl font-black uppercase lg:text-7xl"
             ref={brandName}
           >
             <span className="text-red-500">FO</span>
@@ -296,6 +301,7 @@ const Home = () => {
             <span className="text-purple-500">R</span>
           </h1>
         </div>
+        C
       </section>
       <div ref={foodCardSectionRef}>
         <FoodCardSection foods={foods} />

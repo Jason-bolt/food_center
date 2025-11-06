@@ -1,6 +1,6 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Play } from "lucide-react";
+import { ArrowLeft, Play } from "lucide-react";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 
@@ -22,30 +22,44 @@ const SingleFood = () => {
         .from(foodImage, {
           opacity: 0,
           x: -50,
+          duration: 0.2,
+          ease: "power2.out",
         })
         .from(foodName, {
           opacity: 0,
           x: 50,
+          duration: 0.2,
+          ease: "power2.out",
         })
         .from(foodIngredients, {
           opacity: 0,
           x: 50,
+          duration: 0.2,
+          ease: "power2.out",
         })
         .from(foodLocation, {
           opacity: 0,
           x: -50,
+          duration: 0.2,
+          ease: "power2.out",
         })
         .from(foodCulturalStory, {
           opacity: 0,
           x: -50,
+          duration: 0.2,
+          ease: "power2.out",
         })
         .from(foodDescription, {
           opacity: 0,
           x: 50,
+          duration: 0.2,
+          ease: "power2.out",
         })
         .from(foodVideosButton, {
           opacity: 0,
           x: -50,
+          duration: 0.2,
+          ease: "power2.out",
         });
     },
     { scope: animationContainerRef },
@@ -53,6 +67,13 @@ const SingleFood = () => {
 
   return (
     <section className="min-h-screen pt-2 lg:px-72">
+      <Link
+        to={"/"}
+        className="my-5 flex max-w-28 items-center justify-start gap-2"
+      >
+        <ArrowLeft width={20} />
+        Back
+      </Link>
       <div
         className="flex flex-col items-center justify-center gap-5"
         ref={animationContainerRef}

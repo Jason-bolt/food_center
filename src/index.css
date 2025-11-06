@@ -9,3 +9,23 @@
     transform: translateX(100%);
   }
 }
+
+/* Force custom cursor everywhere except text-editable controls */
+html,
+body,
+body *:not(input):not(textarea):not([contenteditable="true"]),
+a,
+a *,
+button,
+button *,
+[role="button"],
+[role="button"] *,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select,
+label {
+  cursor:
+    url("/wooden_spoon_cursor.cur") 4 4,
+    auto !important;
+}
