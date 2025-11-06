@@ -15,7 +15,7 @@ const FoodVideoPlayer = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
-          <div className="relative p-8">
+          <div className="relative py-8 md:p-8">
             <button
               onClick={() => toggleVideoPlayer(false)}
               className="absolute top-2 right-2 rounded-full p-2 text-gray-800 transition-all duration-200 hover:cursor-pointer hover:bg-white/30 hover:text-gray-900"
