@@ -50,7 +50,7 @@ const Home = () => {
 
   const foods = [
     {
-      _id: 1,
+      _id: "1",
       name: "Beans and gari",
       imageUrl:
         "https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
@@ -61,7 +61,7 @@ const Home = () => {
       ingredients: ["Egg", "Rice", "Beans", "Plantain"],
     },
     {
-      _id: 2,
+      _id: "2",
       name: "Salad and tuna",
       imageUrl:
         "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1480",
@@ -72,7 +72,7 @@ const Home = () => {
       ingredients: ["Egg", "Rice", "Beans", "Plantain"],
     },
     {
-      _id: 3,
+      _id: "3",
       name: "Pizza",
       imageUrl:
         "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1081",
@@ -83,7 +83,7 @@ const Home = () => {
       ingredients: ["Egg", "Rice", "Beans", "Plantain"],
     },
     {
-      _id: 4,
+      _id: "4",
       name: "Jollof rice and chicken",
       imageUrl:
         "https://images.unsplash.com/photo-1664992960082-0ea299a9c53e?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
@@ -94,7 +94,7 @@ const Home = () => {
       ingredients: ["Rice", "Tomato", "Onion", "Chicken", "Pepper"],
     },
     {
-      _id: 5,
+      _id: "5",
       name: "Waakye with gari",
       imageUrl:
         "https://images.unsplash.com/photo-1721314678207-8b7bd43e677b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1035",
@@ -105,7 +105,7 @@ const Home = () => {
       ingredients: ["Rice", "Black-eyed peas", "Gari", "Spaghetti", "Egg"],
     },
     {
-      _id: 6,
+      _id: "6",
       name: "Kelewele",
       imageUrl:
         "https://plus.unsplash.com/premium_photo-1663854478810-26b620ade38a?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070",
@@ -116,7 +116,7 @@ const Home = () => {
       ingredients: ["Plantain", "Ginger", "Clove", "Pepper", "Salt"],
     },
     {
-      _id: 7,
+      _id: "7",
       name: "Banku and tilapia",
       imageUrl:
         "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1400",
@@ -133,7 +133,7 @@ const Home = () => {
       ],
     },
     {
-      _id: 8,
+      _id: "8",
       name: "Fufu and light soup",
       imageUrl:
         "https://images.unsplash.com/photo-1543353071-10c8ba85a904?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1200",
@@ -144,7 +144,7 @@ const Home = () => {
       ingredients: ["Cassava", "Plantain", "Tomato", "Pepper", "Goat"],
     },
     {
-      _id: 9,
+      _id: "9",
       name: "Shito fried rice",
       imageUrl:
         "https://images.unsplash.com/photo-1512058564366-18510be2db19?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2072",
@@ -155,7 +155,7 @@ const Home = () => {
       ingredients: ["Rice", "Shito", "Egg", "Carrot", "Peas"],
     },
     {
-      _id: 10,
+      _id: "10",
       name: "Kokonte and groundnut soup",
       imageUrl:
         "https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-4.1.0&auto=format&fit=crop&q=80&w=1200",
