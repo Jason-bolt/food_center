@@ -105,7 +105,7 @@ const CountryRegionFilter = ({ className }: { className: string }) => {
         <button
           ref={selectCountryButtonRef}
           className={
-            "text-sm text-gray-500 hover:text-gray-700 hover:underline"
+            "text-sm text-gray-500 hover:text-gray-700 hover:underline hover:cursor-pointer"
           }
           onClick={() => setIsCountryModalOpen(true)}
         >
@@ -113,7 +113,7 @@ const CountryRegionFilter = ({ className }: { className: string }) => {
         </button>
         <button
           ref={selectRegionButtonRef}
-          className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
+          className="text-sm text-gray-500 hover:text-gray-700 hover:underline hover:cursor-pointer"
           onClick={() => setIsRegionModalOpen(true)}
         >
           {selectedRegion || "Region"}

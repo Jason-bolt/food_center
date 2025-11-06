@@ -7,9 +7,9 @@ import gsap from "gsap";
 const FoodVideos = () => {
   useGSAP(() => {
     gsap.from(".foodVideoCard", {
-      y: 20,
+      y: 300,
       ease: "power3.out",
-      duration: 0.7,
+      duration: 1,
       opacity: 0,
       stagger: 0.1,
     });
