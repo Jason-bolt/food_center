@@ -38,7 +38,7 @@ const PopUpModal = ({
           <div className="relative p-8">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-all duration-200 hover:bg-white/10 hover:text-gray-600"
+              className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-all duration-200 hover:cursor-pointer hover:bg-white/10 hover:text-gray-600"
             >
               <X size={20} />
             </button>
