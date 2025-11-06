@@ -85,7 +85,7 @@ const FoodCard = ({ food }: { food: IFood }) => {
   return (
     <div
       ref={foodBoxScopeRef}
-      className="relative h-96 rounded-xl bg-gray-400 hover:cursor-pointer"
+      className="relative h-96 rounded-xl bg-gray-400"
     >
       <img
         src={food.imageUrl}
