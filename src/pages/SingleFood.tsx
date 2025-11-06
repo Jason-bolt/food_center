@@ -9,6 +9,25 @@ const SingleFood = () => {
 
   useGSAP(
     () => {
+      const curtain = document.getElementById("curtain");
+
+      gsap.set(curtain, {
+        y: 0,
+        backgroundColor: "#8F00FF",
+        z: 200,
+      });
+
+      gsap.to(curtain, {
+        delay: 1,
+        y: 3000,
+        duration: 1,
+      });
+    },
+    { dependencies: [] },
+  );
+
+  useGSAP(
+    () => {
       const foodImage = document.getElementById("foodImage");
       const foodName = document.getElementById("foodName");
       const foodIngredients = document.getElementById("foodIngredients");
@@ -21,52 +40,77 @@ const SingleFood = () => {
       foodTimeline
         .from(foodImage, {
           opacity: 0,
-          x: -50,
-          duration: 0.2,
+          x: -100,
+          duration: 0.6,
           ease: "power2.out",
         })
         .from(foodName, {
           opacity: 0,
-          x: 50,
-          duration: 0.2,
+          x: 100,
+          duration: 0.4,
           ease: "power2.out",
         })
         .from(foodIngredients, {
           opacity: 0,
-          x: 50,
-          duration: 0.2,
+          x: 100,
+          duration: 0.4,
           ease: "power2.out",
         })
         .from(foodLocation, {
           opacity: 0,
           x: -50,
-          duration: 0.2,
+          duration: 0.4,
           ease: "power2.out",
         })
         .from(foodCulturalStory, {
           opacity: 0,
           x: -50,
-          duration: 0.2,
+          duration: 0.4,
           ease: "power2.out",
         })
         .from(foodDescription, {
           opacity: 0,
           x: 50,
-          duration: 0.2,
+          duration: 0.4,
           ease: "power2.out",
         })
         .from(foodVideosButton, {
           opacity: 0,
           x: -50,
-          duration: 0.2,
+          duration: 0.4,
           ease: "power2.out",
         });
     },
     { scope: animationContainerRef },
   );
 
+  useGSAP(
+    () => {
+      const ball = document.querySelector(".ball");
+      if (!ball) return;
+
+      // Center the ball on its transform origin
+      gsap.set(ball, {
+        xPercent: -50,
+        yPercent: -50,
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      });
+
+      const xTo = gsap.quickTo(ball, "x", { duration: 0.7, ease: "power3" }),
+        yTo = gsap.quickTo(ball, "y", { duration: 0.7, ease: "power3" });
+
+      window.addEventListener("mousemove", (e) => {
+        xTo(e.clientX);
+        yTo(e.clientY);
+      });
+    },
+    { dependencies: [] },
+  );
+
   return (
     <section className="min-h-screen pt-2 lg:px-72">
+      <div className="ball pointer-events-none fixed top-0 left-0 h-15 w-15 rounded-full bg-purple-300 -z-10"></div>
       <Link
         to={"/"}
         className="my-5 flex max-w-28 items-center justify-start gap-2"

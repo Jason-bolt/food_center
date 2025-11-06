@@ -43,6 +43,11 @@ const FoodCardSection = ({ foods }: { foods: IFood[] }) => {
         // Set z-index for layering
         gsap.set(currentFoodCard, { zIndex: 1000 });
 
+        gsap.to(pagination, {
+          autoAlpha: 0,
+          duration: 0.2,
+        });
+
         gsapTimeline
           .to(currentFoodCard, {
             scale: 1.25,
@@ -56,11 +61,13 @@ const FoodCardSection = ({ foods }: { foods: IFood[] }) => {
           })
           .to(".food_components", {
             autoAlpha: 0,
-            duration: 0.7,
+            duration: 0.4,
           })
-          .to(pagination, {
-            autoAlpha: 0,
-            duration: 0.2,
+          .to(currentFoodCard, {
+            rotateZ: 5,
+            repeat: 1,
+            yoyo: true,
+            duration: 0.5,
           })
           .to(currentFoodCard, {
             opacity: 0,

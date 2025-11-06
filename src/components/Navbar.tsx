@@ -105,21 +105,10 @@ const Navbar = ({ searchQuery = "", onSearchChange }: NavbarProps) => {
           />
 
           {/* Modal Container */}
-          <div className="relative mx-4 w-full max-w-md transform transition-all duration-300 ease-out">
+          <div className="relative mx-4 w-full max-w-md">
             {/* Glass Container */}
             <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
-              {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-white/40 to-transparent opacity-50" />
-
-              {/* Liquid glass effect overlay */}
-              <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-60"
-                style={{
-                  background:
-                    "linear-gradient(45deg, transparent 20%, rgba(255,255,255,0.3) 50%, transparent 80%)",
-                  animation: "shimmer 2s ease-in-out infinite",
-                }}
-              />
+            <div className="absolute inset-0 bg-gray-200 opacity-90" />
 
               {/* Content */}
               <div className="relative p-8">
