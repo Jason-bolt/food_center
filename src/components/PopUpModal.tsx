@@ -33,7 +33,7 @@ const PopUpModal = ({
 
       <div className="relative mx-4 w-full max-w-md">
         <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
-          <div className="absolute inset-0 bg-gray-200 opacity-90" />
+          <div className="absolute inset-0 bg-gray-100 opacity-90" />
 
           <div className="relative p-8">
             <button
@@ -64,7 +64,7 @@ const PopUpModal = ({
                     className={`w-full rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
                       selectedElement === element
                         ? "border-blue-500/50 bg-blue-500/20 text-blue-700"
-                        : "border-white/20 bg-gray-200 text-gray-700 hover:cursor-pointer hover:border-white/50 hover:bg-gray-100"
+                        : "border-white/20 bg-gray-100 text-gray-700 hover:cursor-pointer hover:border-white/50 hover:bg-gray-50"
                     }`}
                   >
                     {element}

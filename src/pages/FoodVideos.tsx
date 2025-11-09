@@ -4,10 +4,31 @@ import { ArrowLeft } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import FoodVideoPlayer from "../components/FoodVideoPlayer";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import PopUpModal from "../components/PopUpModal";
 
 const FoodVideos = () => {
   const [isVideoPlayeropen, setIsVideoPlayeropen] = useState<boolean>(false);
+  const [isCreatorModalOpen, setIsCreatorModalOpen] = useState<boolean>(false);
+  const [selectedCreator, setSelectedCreator] = useState<string>("");
+  const selectCreatorModalBackgroundRef = useRef<HTMLDivElement>(null);
+  const selectCreatorModalRef = useRef<HTMLDivElement>(null);
+  const selectCreatorButtonRef = useRef<HTMLButtonElement>(null);
+
+  const creators = [
+    "All creators",
+    "Chef Abby",
+    "Chef John",
+    "Chef Jane",
+    "Chef Jim",
+    "Chef Jill",
+    "Chef Jack",
+  ];
+
+  const onCreatorChange = (creator: string) => {
+    setSelectedCreator(creator);
+  };
+
   useGSAP(() => {
     gsap.from(".foodVideoCard", {
       y: 300,
@@ -17,6 +38,25 @@ const FoodVideos = () => {
       stagger: 0.1,
     });
   });
+
+  useGSAP(
+    () => {
+      if (isCreatorModalOpen && selectCreatorButtonRef.current) {
+        const tl = gsap.timeline();
+        tl.from(selectCreatorModalRef.current, {
+          y: -40,
+          opacity: 0,
+        });
+        tl.from(selectCreatorModalBackgroundRef.current, {
+          opacity: 0,
+          duration: 0.5,
+        });
+      }
+    },
+    {
+      dependencies: [isCreatorModalOpen],
+    },
+  );
 
   const toggleVideoPlayer = (value: boolean) => {
     setIsVideoPlayeropen(value);
@@ -32,6 +72,26 @@ const FoodVideos = () => {
         Back
       </Link>
       <h1 className="mb-5 text-center text-3xl font-bold">Food Name</h1>
+      <div className="flex items-center justify-center">
+        <button
+          className="px-4 pb-5 text-sm text-gray-500 hover:cursor-pointer hover:text-gray-700 hover:underline"
+          ref={selectCreatorButtonRef}
+          onClick={() => setIsCreatorModalOpen(true)}
+        >
+          {selectedCreator || "All creators"}
+        </button>
+        {isCreatorModalOpen && (
+          <PopUpModal
+            elements={creators}
+            onChangeElement={onCreatorChange}
+            selectModalBackgroundRef={selectCreatorModalBackgroundRef}
+            selectModalRef={selectCreatorModalRef}
+            selectedElement={selectedCreator}
+            setIsModalOpen={setIsCreatorModalOpen}
+            type={"Creator"}
+          />
+        )}
+      </div>
       <div className="flex w-full flex-wrap items-center justify-center gap-5">
         <FoodVideoCard
           toggleVideoPlayer={toggleVideoPlayer}

@@ -59,6 +59,12 @@ const FoodCardSection = ({ foods }: { foods: IFood[] }) => {
             rotateY: -8,
             autoAlpha: 1,
           })
+          .to(
+            ".countryRegionFilter", {
+              autoAlpha: 0,
+              duration: 0.4,
+            }
+          )
           .to(".food_components", {
             autoAlpha: 0,
             duration: 0.4,
