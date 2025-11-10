@@ -1,15 +1,9 @@
-import { useEffect, useState } from "react";
-import Navbar from "./Navbar";
+import { useEffect } from "react";
+import Navbar from "../Navbar";
 import { Outlet, useLocation } from "react-router-dom";
 
+
 const RootLayout = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const onSearchChange = (query: string) => {
-    setSearchQuery(query);
-    console.log("Search query:", query);
-  };
-
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -18,7 +12,7 @@ const RootLayout = () => {
 
   return (
     <section className="">
-      <Navbar searchQuery={searchQuery} onSearchChange={onSearchChange} />
+      <Navbar />
       <main className="mx-auto w-full px-4">
         <Outlet />
       </main>

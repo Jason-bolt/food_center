@@ -2,32 +2,26 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Search, X } from "lucide-react";
 import { useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
-interface NavbarProps {
-  searchQuery?: string;
-  selectedCountry?: string;
-  selectedRegion?: string;
-  onSearchChange?: (query: string) => void;
-  onCountryChange?: (country: string) => void;
-  onRegionChange?: (region: string) => void;
-}
-
-const Navbar = ({ searchQuery = "", onSearchChange }: NavbarProps) => {
+const Navbar = () => {
   const navSection = useRef<HTMLElement>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchModalBackgroundRef = useRef<HTMLDivElement>(null);
   const searchButtonRef = useRef<HTMLDivElement>(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const newSearchParams = new URLSearchParams(searchParams);
 
   const currentPath = location.pathname;
 
   useGSAP(
     () => {
+      const queryParams = new URLSearchParams(location.search);
       //   Navbar animation
-      if (currentPath === "/") {
+      if (currentPath === "/" && queryParams.toString() === "") {
         gsap.fromTo(
           navSection.current,
           {
@@ -151,7 +145,8 @@ const Navbar = ({ searchQuery = "", onSearchChange }: NavbarProps) => {
                 <div className="flex gap-3">
                   <button
                     onClick={() => {
-                      onSearchChange?.(localSearchQuery);
+                      newSearchParams.set("search", localSearchQuery);
+                      setSearchParams(newSearchParams);
                       setIsSearchModalOpen(false);
                     }}
                     className="flex-1 rounded-2xl bg-gradient-to-r from-blue-500/80 to-purple-500/80 px-6 py-3 font-medium text-white transition-all duration-200 hover:from-blue-600/90 hover:to-purple-600/90 hover:shadow-lg"
