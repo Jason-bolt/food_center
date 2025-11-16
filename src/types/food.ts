@@ -6,5 +6,5 @@ export interface IFood {
   region: string;
   culturalStory: string;
   ingredients: string[];
+  description: string;
 }
-
