@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import RootLayout from "./components/layout/RootLayout";
 import SingleFood from "./pages/SingleFood";
 import FoodVideos from "./pages/FoodVideos";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/foods/:id" element={<SingleFood />} />
           <Route path="/foods/:id/videos" element={<FoodVideos />} />
         </Route>
+        <Route path="/404" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

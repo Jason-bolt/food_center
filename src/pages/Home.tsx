@@ -67,7 +67,7 @@ const Home = () => {
     setSearchQuery(queryParams.get("search") || "");
     const fetchFoods = async () => {
       const response = await fetch(
-        `http://localhost:3000/api/v1/foods?${queryParams.toString()}`,
+        `${import.meta.env.VITE_SERVER_BASE_URL}/foods?${queryParams.toString()}`,
       );
       const data = await response.json();
       setFetchedFoods(data);

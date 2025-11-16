@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import FoodVideoCard from "../components/FoodVideoCard";
 import { ArrowLeft } from "lucide-react";
 import { useGSAP } from "@gsap/react";
@@ -14,6 +14,8 @@ const FoodVideos = () => {
   const selectCreatorModalBackgroundRef = useRef<HTMLDivElement>(null);
   const selectCreatorModalRef = useRef<HTMLDivElement>(null);
   const selectCreatorButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { id } = useParams();
 
   const creators = [
     "All creators",
@@ -65,7 +67,7 @@ const FoodVideos = () => {
   return (
     <section className="min-h-screen pt-2">
       <Link
-        to={"/foods/3"}
+        to={`/foods/${id}`}
         className="my-5 flex max-w-28 items-center justify-start gap-2 lg:ms-20"
       >
         <ArrowLeft width={20} />
