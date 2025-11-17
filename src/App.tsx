@@ -14,7 +14,7 @@ function App() {
           <Route path="/foods/:id" element={<SingleFood />} />
           <Route path="/foods/:id/videos" element={<FoodVideos />} />
         </Route>
-        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

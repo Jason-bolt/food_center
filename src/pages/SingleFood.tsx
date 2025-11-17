@@ -2,18 +2,18 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ArrowLeft, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import type { IFood } from "../types/food";
 import SingleFoodLoading from "../components/loadings/SingleFoodLoading";
+import NotFound from "./NotFound";
 
 const SingleFood = () => {
   const animationContainerRef = useRef<HTMLDivElement>(null);
   const [fetchedFood, setFetchedFood] = useState<IFood>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
 
   const { id } = useParams();
-
-  const navigate = useNavigate();
 
   // Get foods from API
   useEffect(() => {
@@ -24,7 +24,7 @@ const SingleFood = () => {
       );
       if (!response.ok) {
         setLoading(false);
-        navigate("/404");
+        setError(true);
         return;
       }
       const data = await response.json();
@@ -137,6 +137,10 @@ const SingleFood = () => {
 
   if (loading) {
     return <SingleFoodLoading />;
+  }
+
+  if (error) {
+    return <NotFound />;
   }
 
   return (
