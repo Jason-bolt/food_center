@@ -19,14 +19,23 @@ import pumpkin from "../assets/ingredients/pumpkin-svgrepo-com.svg";
 import roast from "../assets/ingredients/roast-chicken-chicken-svgrepo-com.svg";
 import strawberry from "../assets/ingredients/strawberry-svgrepo-com.svg";
 import watermelon from "../assets/ingredients/watermelon-diet-svgrepo-com.svg";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { HomeIngredientAnimation } from "../types/homeScreen";
 import CountryRegionFilter from "../components/CountryRegionFilter";
 import type { IFood } from "../types/food";
 import type { IPaginatedResponse } from "../types/general";
 import { useLocation } from "react-router-dom";
+import { FoodSectionContext } from "../contexts/FoodSectionContext";
+import { InitialLoadContext } from "../contexts/InitialLoadContext";
 
 const Home = () => {
+  const location = useLocation();
+
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search],
+  );
+
   const ingredients = useMemo(
     () => [
       apple,
@@ -50,7 +59,6 @@ const Home = () => {
     ],
     [],
   );
-  const location = useLocation();
   const [fetchedFoods, setFetchedFoods] = useState<IPaginatedResponse<IFood[]>>(
     {
       data: [],
@@ -60,10 +68,11 @@ const Home = () => {
     },
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const foodSectionContext = useContext(FoodSectionContext);
+  const initialLoadContext = useContext(InitialLoadContext);
 
   // Get foods from API
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
     setSearchQuery(queryParams.get("search") || "");
     const fetchFoods = async () => {
       const response = await fetch(
@@ -71,12 +80,11 @@ const Home = () => {
       );
       const data = await response.json();
       setFetchedFoods(data);
-      console.log(data);
     };
     fetchFoods();
-  }, [location.search]);
+  }, [location.search, queryParams]);
 
-  const foodCardSectionRef = useRef<HTMLDivElement>(null);
+  const foodSectionRef = foodSectionContext.foodSectionRef!;
   const [droppingIngredients, setDroppingIngredients] =
     useState<HomeIngredientAnimation[]>();
 
@@ -100,8 +108,54 @@ const Home = () => {
 
   useGSAP(
     () => {
+      if (!foodSectionRef.current) return;
+
       const queryParams = new URLSearchParams(location.search);
-      if (queryParams.toString() === "") {
+      const isHomePage = queryParams.toString() === "";
+
+      if (
+        isHomePage &&
+        !initialLoadContext.initialLoadAlreadyHappened?.current
+      ) {
+        gsap.fromTo(
+          foodSectionRef.current,
+          {
+            autoAlpha: 0,
+            y: 50,
+          },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1,
+            delay: 5,
+            ease: "power2.out",
+          },
+        );
+      } else {
+        gsap.fromTo(
+          foodSectionRef.current,
+          {
+            autoAlpha: 0,
+            y: 50,
+          },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 1,
+            ease: "power2.out",
+          },
+        );
+      }
+    },
+    { dependencies: [fetchedFoods.data.length] },
+  );
+
+  useGSAP(
+    () => {
+      if (
+        queryParams.toString() === "" &&
+        !initialLoadContext.initialLoadAlreadyHappened?.current
+      ) {
         gsap.set(".countryRegionFilter", {
           autoAlpha: 0,
         });
@@ -172,6 +226,14 @@ const Home = () => {
         gsap.set(brandName.current, {
           autoAlpha: 0,
         });
+        droppingIngredients?.forEach((fruit) => {
+          const dropElement = document.getElementById(`fruit-${fruit.id}`);
+          if (dropElement) {
+            gsap.set(dropElement, {
+              autoAlpha: 0,
+            });
+          }
+        });
       }
     },
     {
@@ -180,20 +242,8 @@ const Home = () => {
     },
   );
 
-  useGSAP(
-    () => {
-      const queryParams = new URLSearchParams(location.search);
-      if (queryParams.toString() === "") {
-        gsap.from(foodCardSectionRef.current, {
-          autoAlpha: 0,
-          y: 50,
-          duration: 1,
-          delay: 5,
-        });
-      }
-    },
-    { dependencies: [location.search] },
-  );
+  console.log("Home page");
+  console.log(initialLoadContext.initialLoadAlreadyHappened?.current);
 
   return (
     <section className="min-h-screen pt-2" ref={initialAnimationContainer}>
@@ -233,9 +283,8 @@ const Home = () => {
             <span className="text-purple-500">R</span>
           </h1>
         </div>
-        C
       </section>
-      <div ref={foodCardSectionRef}>
+      <div ref={foodSectionRef}>
         <FoodCardSection foods={fetchedFoods} />
       </div>
     </section>

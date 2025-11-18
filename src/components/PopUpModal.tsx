@@ -61,7 +61,7 @@ const PopUpModal = ({
                       onChangeElement?.(element);
                       setIsModalOpen(false);
                     }}
-                    className={`w-full rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                    className={`w-full rounded-xl border px-4 py-3 text-left transition-all duration-200 capitalize ${
                       selectedElement === element
                         ? "border-blue-500/50 bg-blue-500/20 text-blue-700"
                         : "border-white/20 bg-gray-100 text-gray-700 hover:cursor-pointer hover:border-white/50 hover:bg-gray-50"

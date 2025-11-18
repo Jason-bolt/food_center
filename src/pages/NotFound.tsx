@@ -109,6 +109,35 @@ const NotFound = () => {
         ease: "power1.out",
       });
     });
+
+    return () => {
+      potOfFoodRef.current?.removeEventListener("mouseenter", () => {
+        spinningPot.pause();
+      });
+
+      potOfFoodRef.current?.removeEventListener("mouseleave", () => {
+        spinningPot.play();
+      });
+
+      leftFour.current?.removeEventListener("click", () => {
+        gsap.to(leftFour.current, {
+          y: -20,
+          repeat: 1,
+          yoyo: true,
+          duration: 0.2,
+          ease: "power1.out",
+        });
+      });
+      rightFour.current?.removeEventListener("click", () => {
+        gsap.to(rightFour.current, {
+          y: -20,
+          repeat: 1,
+          yoyo: true,
+          duration: 0.2,
+          ease: "power1.out",
+        });
+      });
+    };
   });
 
   useGSAP(
