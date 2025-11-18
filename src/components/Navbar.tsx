@@ -1,14 +1,19 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Search, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { FoodSectionContext } from "../contexts/FoodSectionContext";
+import { InitialLoadContext } from "../contexts/InitialLoadContext";
 
 const Navbar = () => {
   const navSection = useRef<HTMLElement>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchModalBackgroundRef = useRef<HTMLDivElement>(null);
   const searchButtonRef = useRef<HTMLDivElement>(null);
+  const searchButtonSubmitRef = useRef<HTMLButtonElement>(null);
+  const foodSectionContext = useContext(FoodSectionContext);
+  const foodSectionRef = foodSectionContext.foodSectionRef;
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const location = useLocation();
@@ -16,12 +21,23 @@ const Navbar = () => {
   const newSearchParams = new URLSearchParams(searchParams);
 
   const currentPath = location.pathname;
+  const queryParams = new URLSearchParams(location.search);
+
+  const initialLoadContext = useContext(InitialLoadContext);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setLocalSearchQuery(params.get("search") || "");
+  }, [location.search]);
 
   useGSAP(
     () => {
-      const queryParams = new URLSearchParams(location.search);
-      //   Navbar animation
-      if (currentPath === "/" && queryParams.toString() === "") {
+      // Navbar animation
+      if (
+        currentPath === "/" &&
+        queryParams.toString() === "" &&
+        !initialLoadContext.initialLoadAlreadyHappened?.current
+      ) {
         gsap.fromTo(
           navSection.current,
           {
@@ -56,6 +72,41 @@ const Navbar = () => {
       dependencies: [isSearchModalOpen],
     },
   );
+
+  useGSAP(
+    () => {
+      const submitSeachForm = () => {
+        setIsSearchModalOpen(false);
+        gsap.to(foodSectionRef!.current, {
+          y: 30,
+          autoAlpha: 0,
+          duration: 0.5,
+          onComplete: () => {
+            if (localSearchQuery === "") {
+              newSearchParams.delete("search");
+              setSearchParams(newSearchParams);
+            }
+            newSearchParams.set("search", localSearchQuery);
+            setSearchParams(newSearchParams);
+            setIsSearchModalOpen(false);
+          },
+        });
+      };
+
+      searchButtonSubmitRef.current?.addEventListener("click", submitSeachForm);
+
+      return () => {
+        searchButtonSubmitRef.current?.removeEventListener(
+          "click",
+          submitSeachForm,
+        );
+      };
+    },
+    { dependencies: [isSearchModalOpen, localSearchQuery, searchParams] },
+  );
+
+  console.log("Navbar");
+  console.log(initialLoadContext.initialLoadAlreadyHappened?.current);
 
   return (
     <nav
@@ -144,12 +195,8 @@ const Navbar = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-3">
                   <button
-                    onClick={() => {
-                      newSearchParams.set("search", localSearchQuery);
-                      setSearchParams(newSearchParams);
-                      setIsSearchModalOpen(false);
-                    }}
-                    className="flex-1 rounded-2xl bg-gradient-to-r from-blue-500/80 to-purple-500/80 px-6 py-3 font-medium text-white transition-all duration-200 hover:from-blue-600/90 hover:to-purple-600/90 hover:shadow-lg"
+                    ref={searchButtonSubmitRef}
+                    className="flex-1 rounded-2xl bg-gradient-to-r from-blue-500/80 to-purple-500/80 px-6 py-3 font-medium text-white transition-all duration-200 hover:cursor-pointer hover:from-blue-600/90 hover:to-purple-600/90 hover:shadow-lg"
                   >
                     Search
                   </button>

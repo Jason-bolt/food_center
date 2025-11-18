@@ -74,7 +74,7 @@ const FoodCardSection = ({ foods }: { foods: IPaginatedResponse<IFood[]> }) => {
             rotateZ: 5,
             repeat: 1,
             yoyo: true,
-            duration: 0.5,
+            duration: 0.3,
           })
           .to(currentFoodCard, {
             opacity: 0,
@@ -105,6 +105,8 @@ const FoodCardSection = ({ foods }: { foods: IPaginatedResponse<IFood[]> }) => {
     },
     { dependencies: [selectedFoodId] },
   );
+
+  console.log("Foods fetched", foods);
 
   return (
     <section className="flex flex-col gap-4">

@@ -2,21 +2,30 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useRef, useState } from "react";
 import PopUpModal from "./PopUpModal";
+import { useSearchParams } from "react-router-dom";
+// import constants from "../utils/constants";
 
 const CountryRegionFilter = ({ className }: { className: string }) => {
+  const queryParams = new URLSearchParams(location.search);
   const [isCountryModalOpen, setIsCountryModalOpen] = useState(false);
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(
+    queryParams.get("country") || "",
+  );
+  const [selectedRegion, setSelectedRegion] = useState("");
+  // const [countries, setCountries] = useState([]);
   const selectCountryButtonRef = useRef<HTMLButtonElement>(null);
   const selectRegionButtonRef = useRef<HTMLButtonElement>(null);
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [selectedRegion, setSelectedRegion] = useState("");
   const selectCountryModalRef = useRef<HTMLDivElement>(null);
   const selectCountryModalBackgroundRef = useRef<HTMLDivElement>(null);
   const selectRegionModalBackgroundRef = useRef<HTMLDivElement>(null);
   const selectRegionModalRef = useRef<HTMLDivElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const newSearchParams = new URLSearchParams(searchParams);
 
   // Countries list
   const countries = [
+    "all",
     "United States",
     "Canada",
     "United Kingdom",
@@ -35,7 +44,29 @@ const CountryRegionFilter = ({ className }: { className: string }) => {
     "Thailand",
     "Greece",
     "Turkey",
+    "ghana",
   ];
+
+  // useEffect(() => {
+  //   const storedCouintries = localStorage.getItem("countries");
+  //   const getCountries = async () => {
+  //     const response = await fetch(constants.COUNTRIES_URL);
+  //     const data = await response.json();
+  //     console.log(data);
+  //     const processedCountries = data?.map((c: { name: string }) =>
+  //       c.name.toLocaleLowerCase(),
+  //     );
+  //     localStorage.setItem("countries", JSON.stringify(processedCountries));
+  //     setCountries(processedCountries);
+  //   };
+
+  //   if (storedCouintries) {
+  //     const parsedStoredCountries = JSON.parse(storedCouintries);
+  //     setCountries(parsedStoredCountries);
+  //   } else {
+  //     getCountries();
+  //   }
+  // }, []);
 
   // Regions list
   const regions = [
@@ -52,8 +83,16 @@ const CountryRegionFilter = ({ className }: { className: string }) => {
   ];
 
   const onCountryChange = (country: string) => {
-    setSelectedCountry(country);
-    console.log("Selected country:", country);
+    if (country === "all") {
+      setSelectedCountry("");
+      newSearchParams.delete("country");
+      setSearchParams(newSearchParams);
+    } else {
+      setSelectedCountry(country);
+      newSearchParams.set("country", country);
+      setSearchParams(newSearchParams);
+      console.log("Selected country:", country);
+    }
   };
 
   const onRegionChange = (region: string) => {
@@ -101,23 +140,23 @@ const CountryRegionFilter = ({ className }: { className: string }) => {
 
   return (
     <section className={`${className} my-5`}>
-      <div className="hidden items-center justify-center gap-10 md:flex">
+      <div className="flex items-center justify-center gap-10">
         <button
           ref={selectCountryButtonRef}
           className={
-            "text-sm text-gray-500 hover:text-gray-700 hover:underline hover:cursor-pointer"
+            "px-2 py-1 text-sm text-gray-500 capitalize hover:cursor-pointer hover:text-gray-700 hover:underline"
           }
           onClick={() => setIsCountryModalOpen(true)}
         >
-          {selectedCountry || "Country"}
+          {selectedCountry || "All Countries"}
         </button>
-        <button
+        {/* <button
           ref={selectRegionButtonRef}
-          className="text-sm text-gray-500 hover:text-gray-700 hover:underline hover:cursor-pointer"
+          className="text-sm text-gray-500 py-1 px-2 hover:text-gray-700 hover:underline hover:cursor-pointer"
           onClick={() => setIsRegionModalOpen(true)}
         >
           {selectedRegion || "Region"}
-        </button>
+        </button> */}
       </div>
       {/* Country Selection Modal */}
       {isCountryModalOpen && (

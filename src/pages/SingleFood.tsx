@@ -131,6 +131,13 @@ const SingleFood = () => {
         xTo(e.clientX);
         yTo(e.clientY);
       });
+
+      return () => {
+        window.removeEventListener("mousemove", (e) => {
+          xTo(e.clientX);
+          yTo(e.clientY);
+        });
+      };
     },
     { dependencies: [loading] },
   );

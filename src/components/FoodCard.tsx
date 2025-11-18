@@ -46,6 +46,18 @@ const FoodCard = ({ food }: { food: IFood }) => {
         darkOverlayAnimation.reverse();
         overlayTextAnimation.reverse();
       });
+
+      return () => {
+        foodBoxScopeRef.current?.removeEventListener("mouseenter", () => {
+          darkOverlayAnimation.play();
+          overlayTextAnimation.play();
+        });
+
+        foodBoxScopeRef.current?.removeEventListener("mouseleave", () => {
+          darkOverlayAnimation.reverse();
+          overlayTextAnimation.reverse();
+        });
+      };
     },
     { scope: foodBoxScopeRef },
   );
@@ -63,11 +75,11 @@ const FoodCard = ({ food }: { food: IFood }) => {
       />
       <div
         ref={darkOverlayRef}
-        className="absolute top-0 z-10 h-full w-full rounded-xl bg-black food_components"
+        className="food_components absolute top-0 z-10 h-full w-full rounded-xl bg-black"
       ></div>
       <div
         ref={foodDetailsRef}
-        className="absolute bottom-0 w-full rounded-b-xl bg-black/70 food_components"
+        className="food_components absolute bottom-0 w-full rounded-b-xl bg-black/70"
       >
         <div className="items-top flex flex-col justify-start px-4 py-5">
           <h1 className="mb-2 text-2xl font-black text-white capitalize">
