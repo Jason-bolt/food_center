@@ -7,7 +7,6 @@ const FoodVideoPlayer = ({
   videoId: string;
   toggleVideoPlayer: (value: boolean) => void;
 }) => {
-  console.log(videoId);
   return (
     <section
       className="fixed inset-0 flex items-center justify-center bg-black/10 backdrop-blur-md"

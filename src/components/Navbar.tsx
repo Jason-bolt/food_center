@@ -105,9 +105,6 @@ const Navbar = () => {
     { dependencies: [isSearchModalOpen, localSearchQuery, searchParams] },
   );
 
-  console.log("Navbar");
-  console.log(initialLoadContext.initialLoadAlreadyHappened?.current);
-
   return (
     <nav
       ref={navSection}

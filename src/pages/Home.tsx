@@ -242,9 +242,6 @@ const Home = () => {
     },
   );
 
-  console.log("Home page");
-  console.log(initialLoadContext.initialLoadAlreadyHappened?.current);
-
   return (
     <section className="min-h-screen pt-2" ref={initialAnimationContainer}>
       <CountryRegionFilter className="countryRegionFilter" />
