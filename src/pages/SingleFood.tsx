@@ -10,7 +10,7 @@ import NotFound from "./NotFound";
 const SingleFood = () => {
   const animationContainerRef = useRef<HTMLDivElement>(null);
   const [fetchedFood, setFetchedFood] = useState<IFood>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
   const { id } = useParams();
@@ -55,6 +55,8 @@ const SingleFood = () => {
 
   useGSAP(
     () => {
+      if (loading || error) return;
+
       const foodImage = document.getElementById("foodImage");
       const foodName = document.getElementById("foodName");
       const foodIngredients = document.getElementById("foodIngredients");
@@ -108,7 +110,7 @@ const SingleFood = () => {
           ease: "power2.out",
         });
     },
-    { scope: animationContainerRef },
+    { dependencies: [id, loading, error], scope: animationContainerRef },
   );
 
   useGSAP(

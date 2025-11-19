@@ -106,8 +106,6 @@ const FoodCardSection = ({ foods }: { foods: IPaginatedResponse<IFood[]> }) => {
     { dependencies: [selectedFoodId] },
   );
 
-  console.log("Foods fetched", foods);
-
   return (
     <section className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">

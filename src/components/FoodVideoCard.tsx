@@ -1,11 +1,31 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Observer } from "gsap/Observer";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
-const FoodVideoCard = ({ className, toggleVideoPlayer }: { className: string; toggleVideoPlayer: (value: boolean) => void }) => {
+const FoodVideoCard = ({
+  className,
+  imageUrl,
+  title,
+  influencerName,
+  publishedAt,
+  toggleVideoPlayer,
+}: {
+  className: string;
+  imageUrl: string;
+  title: string;
+  influencerId?: string;
+  influencerName: string;
+  publishedAt: string;
+  toggleVideoPlayer: (value: boolean) => void;
+}) => {
   gsap.registerPlugin(Observer);
   const foodVideoCard = useRef<HTMLDivElement>(null);
+
+  const processedDate = useMemo(() => {
+    const dateObject = new Date(publishedAt);
+    return dateObject.toDateString();
+  }, []);
 
   useGSAP(() => {
     Observer.create({
@@ -37,15 +57,18 @@ const FoodVideoCard = ({ className, toggleVideoPlayer }: { className: string; to
       onClick={() => toggleVideoPlayer(true)}
     >
       <img
-        src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1081"
-        alt="thumbnail"
+        src={imageUrl}
+        alt={title}
         className="h-72 w-full rounded-xl object-cover object-center md:w-96"
       />
       <div className="pt-1">
-        <h2 className="font-semibold">How to prepare jollof: Ghana style!</h2>
+        <h2 className="font-semibold">{title}</h2>
+        <p className="mb-1 text-xs font-extralight text-gray-500">
+          {processedDate}
+        </p>
         <div className="flex flex-col">
           <h1 className="text-xs underline">Creator:</h1>
-          <p className="text-xs">Chef Abby</p>
+          <p className="text-xs">{influencerName}</p>
         </div>
       </div>
     </div>
