@@ -8,3 +8,16 @@ export interface IFood {
   ingredients: string[];
   description: string;
 }
+
+export interface IFoodVideo {
+  _id: string;
+  influencer: {
+    _id: string;
+    name: string;
+  };
+  videoUrl: string;
+  videoId: string;
+  videoTitle: string;
+  videoThumbnailUrl: string;
+  videoPublishedAt: string;
+}

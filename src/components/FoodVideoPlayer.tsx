@@ -1,10 +1,13 @@
 import { X } from "lucide-react";
 
 const FoodVideoPlayer = ({
+  videoId,
   toggleVideoPlayer,
 }: {
+  videoId: string;
   toggleVideoPlayer: (value: boolean) => void;
 }) => {
+  console.log(videoId);
   return (
     <section
       className="fixed inset-0 flex items-center justify-center bg-black/10 backdrop-blur-md"
@@ -26,7 +29,7 @@ const FoodVideoPlayer = ({
             <div className="mt-3 mb-3 w-full text-center">
               <iframe
                 className="h-96 w-full"
-                src="https://www.youtube.com/embed/L67RL6aQmj0?si=WlgjEynCTUzgRZJk"
+                src={`https://www.youtube.com/embed/${videoId}`}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
