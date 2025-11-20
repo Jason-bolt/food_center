@@ -108,7 +108,7 @@ const Navbar = () => {
   return (
     <nav
       ref={navSection}
-      className="relative flex flex-col border-b border-gray-100 bg-gray-50"
+      className="relative flex flex-col border-b border-orange-200 bg-gray-50"
     >
       <section className="flex items-center justify-between px-10 py-5">
         <Link

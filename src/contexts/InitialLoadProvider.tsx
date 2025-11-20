@@ -1,15 +1,18 @@
 import { type ReactNode, useRef, useEffect } from "react";
 import { InitialLoadContext } from "./InitialLoadContext";
+import { getWithExpiry, setWithExpiry } from "../utils/helpers/general";
 
 const InitialLoadProvider = ({ children }: { children: ReactNode }) => {
   const initialLoadAlreadyHappened = useRef<boolean>(false);
-  const initialLoad = localStorage.getItem("isLoaded");
+  const initialLoad = getWithExpiry("isLoaded");
 
   useEffect(() => {
+    const oneHour = 1000 * 60 * 60 * 1;
     if (initialLoad) {
       initialLoadAlreadyHappened.current = true;
+      setWithExpiry("isLoaded", "true", oneHour);
     } else {
-      localStorage.setItem("isLoaded", "true");
+      setWithExpiry("isLoaded", "true", oneHour);
     }
   }, []);
 
