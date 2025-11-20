@@ -25,7 +25,7 @@ const FoodVideoCard = ({
   const processedDate = useMemo(() => {
     const dateObject = new Date(publishedAt);
     return dateObject.toDateString();
-  }, []);
+  }, [publishedAt]);
 
   useGSAP(() => {
     Observer.create({
@@ -61,8 +61,8 @@ const FoodVideoCard = ({
         alt={title}
         className="h-72 w-full rounded-xl object-cover object-center md:w-96"
       />
-      <div className="pt-1">
-        <h2 className="font-semibold">{title}</h2>
+      <div className="max-w-96 pt-1">
+        <h2 className="leading-5 font-semibold">{title}</h2>
         <p className="mb-1 text-xs font-extralight text-gray-500">
           {processedDate}
         </p>
