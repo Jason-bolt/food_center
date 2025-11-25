@@ -1,7 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import type { IFood } from "../types/food";
 import FoodCard from "./FoodCard";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
 import Pagination from "./Pagination";
@@ -11,6 +11,8 @@ const FoodCardSection = ({ foods }: { foods: IPaginatedResponse<IFood[]> }) => {
   const navigate = useNavigate();
   const { data, totalpages, page } = foods;
   const [selectedFoodId, setSelectedFoodId] = useState<string>("");
+  const noFoodTextRef = useRef<HTMLDivElement>(null);
+
   useGSAP(
     () => {
       const gsapTimeline = gsap.timeline();
@@ -106,8 +108,61 @@ const FoodCardSection = ({ foods }: { foods: IPaginatedResponse<IFood[]> }) => {
     { dependencies: [selectedFoodId] },
   );
 
+  useGSAP(
+    () => {
+      gsap.set("#noFoodText1", {
+        x: -2000,
+        opacity: 0,
+      });
+      gsap.set("#noFoodText2", {
+        x: 2000,
+        opacity: 0,
+      });
+      gsap.set("#noFoodText3", {
+        x: -2000,
+        opacity: 0,
+      });
+
+      const noFoodTextTl = gsap.timeline();
+      noFoodTextTl.to("#noFoodText1", {
+        x: 0,
+        opacity: 1,
+        duration: 0.2,
+        ease: "bounce.out",
+      });
+
+      noFoodTextTl.to("#noFoodText2", {
+        x: 0,
+        opacity: 1,
+        duration: 0.2,
+        ease: "bounce.out",
+      });
+
+      noFoodTextTl.to("#noFoodText3", {
+        x: 0,
+        opacity: 1,
+        duration: 0.2,
+        ease: "bounce.out",
+      });
+    },
+    { dependencies: [data], scope: noFoodTextRef },
+  );
+
   return (
     <section className="flex flex-col gap-4">
+      {!data.length! && (
+        <div className="min-h-screen pt-30 text-center" ref={noFoodTextRef}>
+          <p className="my-7 text-5xl font-black" id="noFoodText1">
+            No foods
+          </p>
+          <p className="my-7 text-5xl font-black" id="noFoodText2">
+            currently
+          </p>
+          <p className="my-7 text-5xl font-black" id="noFoodText3">
+            loaded currently!
+          </p>
+        </div>
+      )}
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         {data.map((food) => (
           <div

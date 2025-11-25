@@ -11,7 +11,7 @@ const RootLayout = () => {
   }, [pathname]);
 
   return (
-    <section className="" style={{ backgroundImage: `url(${backgroundAfrica})` }}>
+    <section className="" style={{ backgroundImage: `url(${backgroundAfrica})`, backgroundSize: '900px' }}>
       <Navbar />
       <main className="mx-auto w-full px-4">
         <Outlet />

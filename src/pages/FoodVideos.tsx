@@ -33,7 +33,7 @@ const FoodVideos = () => {
   const selectInfluencerModalBackgroundRef = useRef<HTMLDivElement>(null);
   const selectInfluencerModalRef = useRef<HTMLDivElement>(null);
   const selectInfluencerButtonRef = useRef<HTMLButtonElement>(null);
-  const noVideoTextRef = useRef<HTMLElement>(null);
+  const noVideoTextRef = useRef<HTMLDivElement>(null);
 
   const { id } = useParams();
   const location = useLocation();
@@ -264,7 +264,7 @@ const FoodVideos = () => {
       </div>
       <div className="flex w-full flex-wrap items-start justify-center gap-7 mb-20">
         {!foodVideos.length && (
-          <section
+          <div
             className="mt-30 min-h-screen text-center"
             ref={noVideoTextRef}
           >
@@ -277,7 +277,7 @@ const FoodVideos = () => {
             <p className="my-7 text-5xl font-black" id="noVideoText3">
               food / influencer
             </p>
-          </section>
+          </div>
         )}
         {foodVideos.map((foodVideo: IFoodVideo) => (
           <div onClick={() => setSelectedVideoId(foodVideo.videoId)}>

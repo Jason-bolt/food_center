@@ -154,7 +154,7 @@ const SingleFood = () => {
 
   return (
     <section className="min-h-screen pt-2 lg:px-72">
-      <div className="ball pointer-events-none fixed top-0 left-0 -z-10 h-15 w-15 rounded-full bg-purple-300"></div>
+      <div className="ball pointer-events-none fixed top-0 left-0 h-15 w-15 rounded-full bg-purple-300"></div>
       <Link
         to={"/"}
         className="my-5 flex max-w-28 items-center justify-start gap-2"
@@ -174,11 +174,17 @@ const SingleFood = () => {
         />
         <div className="flex w-full flex-col items-start justify-center">
           <div className="flex w-full flex-col items-start">
-            <h1 className="my-1 text-3xl font-bold text-black" id="foodName">
+            <h1
+              className="my-1 text-3xl font-bold text-orange-900"
+              id="foodName"
+            >
               {fetchedFood?.name}
             </h1>
-            <p className="text-sm" id="foodIngredients">
-              {fetchedFood?.ingredients.join(", ")}
+            <p
+              className="text-sm text-gray-500 capitalize"
+              id="foodIngredients"
+            >
+              {fetchedFood?.ingredients.join(", ")}.
             </p>
             <p className="my-3 text-xs" id="foodLocation">
               {fetchedFood?.country}, {fetchedFood?.region}
@@ -188,14 +194,14 @@ const SingleFood = () => {
               id="foodCulturalStory"
             >
               <h1 className="text-xl font-bold">Cultural Story:</h1>
-              <p>{fetchedFood?.culturalStory}</p>
+              <p className="text-gray-700">{fetchedFood?.culturalStory}</p>
             </div>
             <div
               className="my-3 flex w-full flex-col items-start justify-center"
               id="foodDescription"
             >
               <h1 className="text-xl font-bold">Description:</h1>
-              <p>{fetchedFood?.description}</p>
+              <p className="text-gray-700">{fetchedFood?.description}</p>
             </div>
             <Link
               to={`/foods/${id}/videos`}

@@ -95,7 +95,9 @@ const FoodCard = ({ food }: { food: IFood }) => {
           </p>
           <p className="text-xs">
             <span className="font-bold text-orange-400">Ingredients:</span>{" "}
-            <span className="text-white">{food?.ingredients?.join(", ")}</span>
+            <span className="text-white capitalize">
+              {food?.ingredients?.join(", ")}
+            </span>
           </p>
           <div className="mt-5 flex flex-col items-start justify-center">
             <h1 className="text-sm font-bold text-white underline">
