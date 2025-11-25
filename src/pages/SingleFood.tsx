@@ -159,8 +159,10 @@ const SingleFood = () => {
         to={"/"}
         className="my-5 flex max-w-28 items-center justify-start gap-2"
       >
-        <ArrowLeft width={20} />
-        Back
+        <span className="z-10">
+          <ArrowLeft width={20} />
+        </span>
+        <span className="z-10">Back</span>
       </Link>
       <div
         className="flex flex-col items-center justify-center gap-5"
@@ -186,21 +188,25 @@ const SingleFood = () => {
             >
               {fetchedFood?.ingredients.join(", ")}.
             </p>
-            <p className="my-3 text-xs" id="foodLocation">
-              {fetchedFood?.country}, {fetchedFood?.region}
+            <p
+              className="my-3 flex flex-col items-start justify-center text-xs capitalize"
+              id="foodLocation"
+            >
+              <span className="font-semibold">{fetchedFood?.countries.join(", ")}</span>
+              <span>{fetchedFood?.region}</span>
             </p>
             <div
               className="my-3 flex w-full flex-col items-start justify-center"
               id="foodCulturalStory"
             >
-              <h1 className="text-xl font-bold">Cultural Story:</h1>
+              <h1 className="text-xl font-bold mb-2 mt-1">Cultural Story:</h1>
               <p className="text-gray-700">{fetchedFood?.culturalStory}</p>
             </div>
             <div
               className="my-3 flex w-full flex-col items-start justify-center"
               id="foodDescription"
             >
-              <h1 className="text-xl font-bold">Description:</h1>
+              <h1 className="text-xl font-bold mb-2 mt-1">Description:</h1>
               <p className="text-gray-700">{fetchedFood?.description}</p>
             </div>
             <Link

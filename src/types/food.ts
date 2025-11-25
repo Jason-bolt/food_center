@@ -2,7 +2,7 @@ export interface IFood {
   _id: string;
   imageUrl: string;
   name: string;
-  country: string;
+  countries: string[];
   region: string;
   culturalStory: string;
   ingredients: string[];

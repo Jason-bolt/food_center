@@ -86,8 +86,10 @@ const FoodCard = ({ food }: { food: IFood }) => {
             {food.name}
           </h1>
           <p className="text-xs">
-            <span className="font-bold text-orange-400">Country:</span>{" "}
-            <span className="text-white">{food.country}</span>
+            <span className="font-bold text-orange-400">Countries:</span>{" "}
+            <span className="text-white capitalize">
+              {food.countries.join(", ")}
+            </span>
           </p>
           <p className="text-xs">
             <span className="font-bold text-orange-400">Region:</span>{" "}
