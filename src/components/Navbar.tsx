@@ -2,7 +2,13 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { Search, X } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  createSearchParams,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { FoodSectionContext } from "../contexts/FoodSectionContext";
 import { InitialLoadContext } from "../contexts/InitialLoadContext";
 
@@ -24,6 +30,7 @@ const Navbar = () => {
   const queryParams = new URLSearchParams(location.search);
 
   const initialLoadContext = useContext(InitialLoadContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -85,10 +92,27 @@ const Navbar = () => {
             if (localSearchQuery === "") {
               newSearchParams.delete("search");
               setSearchParams(newSearchParams);
+              setIsSearchModalOpen(false);
             }
-            newSearchParams.set("search", localSearchQuery);
-            setSearchParams(newSearchParams);
-            setIsSearchModalOpen(false);
+
+            console.log("CURERNT PATH", currentPath);
+
+            if (currentPath === "/") {
+              newSearchParams.set("search", localSearchQuery);
+              setSearchParams(newSearchParams);
+              setIsSearchModalOpen(false);
+            } else {
+              const queryString = createSearchParams({
+                search: localSearchQuery,
+              }).toString();
+              navigate(
+                {
+                  pathname: "/",
+                  search: `?${queryString}`,
+                },
+                { replace: true },
+              );
+            }
           },
         });
       };
