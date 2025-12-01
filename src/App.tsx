@@ -6,6 +6,8 @@ import FoodVideos from "./pages/FoodVideos";
 import NotFound from "./pages/NotFound";
 import FoodSectionProvider from "./contexts/FoodSectionProvider";
 import InitialLoadProvider from "./contexts/InitialLoadProvider";
+import AdminLayout from "./components/layout/AdminLayout";
+import AdminHome from "./pages/admin/AdminHome";
 
 function App() {
   return (
@@ -17,6 +19,9 @@ function App() {
               <Route index element={<Home />} />
               <Route path="/foods/:id" element={<SingleFood />} />
               <Route path="/foods/:id/videos" element={<FoodVideos />} />
+            </Route>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminHome />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

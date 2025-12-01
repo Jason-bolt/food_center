@@ -9,10 +9,9 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
-import { FoodSectionContext } from "../contexts/FoodSectionContext";
-import { InitialLoadContext } from "../contexts/InitialLoadContext";
+import { FoodSectionContext } from "../../contexts/FoodSectionContext";
 
-const Navbar = () => {
+const AdminNavbar = () => {
   const navSection = useRef<HTMLElement>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchModalBackgroundRef = useRef<HTMLDivElement>(null);
@@ -27,38 +26,12 @@ const Navbar = () => {
   const newSearchParams = new URLSearchParams(searchParams);
 
   const currentPath = location.pathname;
-  const queryParams = new URLSearchParams(location.search);
-
-  const initialLoadContext = useContext(InitialLoadContext);
   const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setLocalSearchQuery(params.get("search") || "");
   }, [location.search]);
-
-  useGSAP(
-    () => {
-      // Navbar animation
-      if (
-        currentPath === "/" &&
-        queryParams.toString() === "" &&
-        !initialLoadContext.initialLoadAlreadyHappened?.current
-      ) {
-        gsap.fromTo(
-          navSection.current,
-          {
-            autoAlpha: 0,
-          },
-          {
-            autoAlpha: 1,
-            delay: 2,
-          },
-        );
-      }
-    },
-    { dependencies: [currentPath] },
-  );
 
   // Animate modal when it opens
   useGSAP(
@@ -97,7 +70,7 @@ const Navbar = () => {
 
             console.log("CURERNT PATH", currentPath);
 
-            if (currentPath === "/") {
+            if (currentPath === "/admin") {
               newSearchParams.set("search", localSearchQuery);
               setSearchParams(newSearchParams);
               setIsSearchModalOpen(false);
@@ -107,7 +80,7 @@ const Navbar = () => {
               }).toString();
               navigate(
                 {
-                  pathname: "/",
+                  pathname: "/admin",
                   search: `?${queryString}`,
                 },
                 { replace: true },
@@ -140,6 +113,7 @@ const Navbar = () => {
           className="text-xl font-bold uppercase italic transition-all duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-80"
         >
           <span className="text-orange-500">FOOD CENTER</span>
+          <span className="text-orange-600"> - ADMIN</span>
         </Link>
 
         <div
@@ -228,4 +202,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default AdminNavbar;
