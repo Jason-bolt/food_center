@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import CountryRegionFilter from "../../components/CountryRegionFilter";
 import type { IPaginatedResponse } from "../../types/general";
-import type { IFood } from "../../types/food";
-import { useLocation } from "react-router-dom";
+import type { IFood, IFoodRequest } from "../../types/food";
+import { useLocation, useSearchParams } from "react-router-dom";
 import AdminFoodCardSection from "../../components/admin/AdminFoodCardSection";
-import { X } from "lucide-react";
+import FoodModal from "./FoodModal";
+import { uploadImage } from "../../utils/helpers/general";
+import {
+  createFoodRequest,
+  deleteFoodRequest,
+  updateFoodRequest,
+} from "../../utils/helpers/apiCalls";
 
 const AdminHome = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,13 +22,25 @@ const AdminHome = () => {
       totalItems: 0,
     },
   );
-  const [selectedFoodId, setSelectedFoodId] = useState<string>("");
+  const [selectedFoodId, setSelectedFoodId] = useState<string>();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const selectModalRef = useRef<HTMLDivElement>(null);
   const selectModalBackgroundRef = useRef<HTMLDivElement>(null);
+  const [createFoodData, setCreateFoodData] = useState<IFoodRequest>();
+  const [updateFoodData, setUpdateFoodData] = useState<IFoodRequest>();
+  const [refetchTrigger, setRefetchTrigger] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedFood, setSelectedFood] = useState<IFood | undefined>(
+    undefined,
+  );
+  const [pageQuery, setPageQuery] = useState<number>(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const newSearchParams = new URLSearchParams(searchParams);
 
   const updateSelectedFood = (foodId: string) => {
     setSelectedFoodId(foodId);
+    const clickedFood = fetchedFoods.data.find((f) => f._id === foodId);
+    setSelectedFood(clickedFood);
+    setIsModalOpen(true);
   };
 
   const location = useLocation();
@@ -34,15 +52,191 @@ const AdminHome = () => {
   // Get foods from API
   useEffect(() => {
     setSearchQuery(queryParams.get("search") || "");
+    setPageQuery(Number(queryParams.get("page")) || 1);
     const fetchFoods = async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_BASE_URL}/foods?${queryParams.toString()}`,
-      );
-      const data = await response.json();
-      setFetchedFoods(data);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_SERVER_BASE_URL}/foods?${queryParams.toString()}`,
+        );
+        const data = await response.json();
+        setFetchedFoods(data);
+      } catch (error) {
+        console.error("Error fetching foods:", error);
+      }
     };
     fetchFoods();
-  }, [location.search, queryParams]);
+  }, [location.search, queryParams, refetchTrigger]);
+
+  // Create food when createFoodData is set
+  useEffect(() => {
+    if (!createFoodData) return;
+    console.log(createFoodData);
+
+    // Prevent race conditions
+    let isCancelled = false;
+
+    const createFood = async () => {
+      try {
+        // Validate required data
+        if (
+          !createFoodData.image ||
+          !createFoodData.countries ||
+          !createFoodData.ingredients
+        ) {
+          throw new Error("Missing required fields");
+        }
+
+        const imageUrl = await uploadImage(createFoodData.image);
+
+        if (isCancelled) return; // Check after async operation
+
+        if (!imageUrl?.image) {
+          throw new Error("Image upload returned invalid response");
+        }
+
+        const preparedData = {
+          ...createFoodData,
+          imageUrl: imageUrl.image,
+          countries: createFoodData.countries.split(",").map((c) => c.trim()),
+          ingredients: createFoodData.ingredients
+            .split(",")
+            .map((i) => i.trim()),
+        };
+
+        console.log(preparedData);
+        const response = await createFoodRequest(preparedData);
+
+        if (isCancelled) return; // Check after async operation
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Failed to create food: ${response.status} - ${errorText}`,
+          );
+        }
+        await response.json();
+
+        // Success
+        setRefetchTrigger((prev) => prev + 1);
+        setIsLoading(false);
+        // Consider adding success toast/notification here
+      } catch (error) {
+        if (isCancelled) return;
+
+        console.error("Error creating food:", error);
+        // TODO: Show error to user (toast, alert, error state, etc.)
+        // Example: setError(error instanceof Error ? error.message : "Failed to create food");
+      } finally {
+        if (!isCancelled) {
+          setCreateFoodData(undefined);
+        }
+        setIsModalOpen(false);
+        setSelectedFood(undefined);
+      }
+    };
+
+    createFood();
+
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+    };
+  }, [createFoodData, setRefetchTrigger]); // Add all dependencies
+
+  // Create food when createFoodData is set
+  useEffect(() => {
+    if (!updateFoodData) return;
+    console.log(updateFoodData);
+
+    // Prevent race conditions
+    let isCancelled = false;
+
+    const updateFood = async () => {
+      try {
+        // Validate required data
+        if (
+          !updateFoodData.image ||
+          !updateFoodData.countries ||
+          !updateFoodData.ingredients
+        ) {
+          throw new Error("Missing required fields");
+        }
+
+        const imageUrl = await uploadImage(updateFoodData.image);
+
+        if (isCancelled) return; // Check after async operation
+
+        if (!imageUrl?.image) {
+          throw new Error("Image upload returned invalid response");
+        }
+
+        const preparedData = {
+          ...updateFoodData,
+          imageUrl: imageUrl.image,
+          countries: updateFoodData.countries.split(",").map((c) => c.trim()),
+          ingredients: updateFoodData.ingredients
+            .split(",")
+            .map((i) => i.trim()),
+        };
+
+        console.log(preparedData);
+
+        const response = await updateFoodRequest(preparedData, selectedFoodId);
+
+        if (isCancelled) return; // Check after async operation
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(
+            `Failed to create food: ${response.status} - ${errorText}`,
+          );
+        }
+        await response.json();
+
+        // Success
+        setRefetchTrigger((prev) => prev + 1);
+        setIsLoading(false);
+        // Consider adding success toast/notification here
+      } catch (error) {
+        if (isCancelled) return;
+
+        console.error("Error creating food:", error);
+        // TODO: Show error to user (toast, alert, error state, etc.)
+        // Example: setError(error instanceof Error ? error.message : "Failed to create food");
+      } finally {
+        if (!isCancelled) {
+          setUpdateFoodData(undefined);
+        }
+        setIsModalOpen(false);
+        setSelectedFood(undefined);
+      }
+    };
+
+    updateFood();
+
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+    };
+  }, [updateFoodData, setRefetchTrigger]); // Add all dependencies
+
+  async function deleteFood() {
+    const confirmDeletion = confirm("You are deleting this food item!");
+    if (!confirmDeletion) return;
+
+    const response = await deleteFoodRequest(selectedFood?._id);
+    if (response.ok) {
+      console.log("Deleting...");
+      if (fetchedFoods.data.length % 10 < pageQuery && pageQuery > 1) {
+        newSearchParams.set("page", (pageQuery - 1).toString());
+        setSearchParams(newSearchParams);
+      }
+      setRefetchTrigger((prev) => prev + 1);
+    } else {
+      console.log("An error occured");
+    }
+    setIsModalOpen(false);
+  }
 
   return (
     <section className="min-h-screen pt-2">
@@ -56,124 +250,25 @@ const AdminHome = () => {
       <div className="mb-5 flex items-center justify-center">
         <button
           className="rounded-lg bg-orange-200 px-6 py-2 font-bold text-orange-800 hover:cursor-pointer hover:bg-orange-300"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setSelectedFood(undefined);
+            setIsModalOpen(true);
+          }}
         >
           Add Food
         </button>
 
         {isModalOpen && (
-          <div
-            className="fixed inset-0 z-50 flex items-start justify-center pt-16"
-            ref={selectModalRef}
-          >
-            <div
-              ref={selectModalBackgroundRef}
-              className="absolute inset-0 bg-black/10 backdrop-blur-md"
-              onClick={() => setIsModalOpen(false)}
-            />
-
-            <div className="relative mx-4 w-full max-w-xl">
-              <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
-                <div className="absolute inset-0 bg-gray-100 opacity-90" />
-
-                <div className="relative max-h-[650px] overflow-y-scroll p-8 my-5">
-                  <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-all duration-200 hover:cursor-pointer hover:bg-white/10 hover:text-gray-600"
-                  >
-                    <X size={20} />
-                  </button>
-
-                  <div className="text-center">
-                    <h2 className="mb-2 text-2xl font-bold text-gray-800">
-                      Add Food
-                    </h2>
-                    <form className="form">
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="foodName" className="font-semibold">
-                          Food name
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full rounded-lg border border-orange-400 p-2"
-                        />
-                      </div>
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="foodName" className="font-semibold">
-                          Food description
-                        </label>
-                        <textarea
-                          name="food_description"
-                          id="food_description"
-                          className="w-full rounded-lg border border-orange-400 p-2"
-                        ></textarea>
-                      </div>
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="foodName" className="font-semibold">
-                          Cultural story
-                        </label>
-                        <textarea
-                          name="cultural_story"
-                          id="cultural_story"
-                          className="w-full rounded-lg border border-orange-400 p-2"
-                        ></textarea>
-                      </div>
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="foodImage" className="font-semibold">
-                          Food image
-                        </label>
-                        <label htmlFor="food_image">
-                          <span>Upload file</span>
-                          <input
-                            type="file"
-                            name="food_image"
-                            id="food_image"
-                            className="sr-only"
-                          />
-                        </label>
-                      </div>
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="countries" className="font-semibold">
-                          Countries
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full rounded-lg border border-orange-400 px-2 py-3"
-                          placeholder="ghana,nigeria,togo"
-                        />
-                      </div>
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="regions" className="font-semibold">
-                          Region
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full rounded-lg border border-orange-400 px-2 py-3"
-                          placeholder="region"
-                        />
-                      </div>
-                      <div className="my-3 flex flex-col items-start justify-center gap-2">
-                        <label htmlFor="ingredients" className="font-semibold">
-                          Ingredients
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full rounded-lg border border-orange-400 px-2 py-3"
-                          placeholder="rice,oil,beans"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full rounded-lg bg-orange-400 text-center text-white py-4 mt-3 hover:bg-orange-500"
-                      >
-                        Submit
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <FoodModal
+            selectModalBackgroundRef={selectModalBackgroundRef}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            setIsModalOpen={setIsModalOpen}
+            setCreateFoodData={setCreateFoodData}
+            setUpdateFoodData={setUpdateFoodData}
+            selectedFood={selectedFood}
+            deleteFood={deleteFood}
+          />
         )}
       </div>
       <AdminFoodCardSection

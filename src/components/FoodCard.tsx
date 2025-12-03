@@ -75,7 +75,7 @@ const FoodCard = ({ food }: { food: IFood }) => {
       />
       <div
         ref={darkOverlayRef}
-        className="food_components absolute top-0 z-10 h-full w-full rounded-xl bg-black"
+        className="food_components absolute top-0 h-full w-full rounded-xl bg-black"
       ></div>
       <div
         ref={foodDetailsRef}

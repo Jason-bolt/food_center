@@ -109,7 +109,7 @@ const AdminNavbar = () => {
     >
       <section className="flex items-center justify-between px-10 py-5">
         <Link
-          to={"/"}
+          to={"/admin"}
           className="text-xl font-bold uppercase italic transition-all duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-80"
         >
           <span className="text-orange-500">FOOD CENTER</span>

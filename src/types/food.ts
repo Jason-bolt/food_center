@@ -9,6 +9,16 @@ export interface IFood {
   description: string;
 }
 
+export interface IFoodRequest {
+  image: File;
+  name: string;
+  countries: string;
+  region: string;
+  culturalStory: string;
+  ingredients: string;
+  description: string;
+}
+
 export interface IFoodVideo {
   _id: string;
   influencer: {
