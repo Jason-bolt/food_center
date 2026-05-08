@@ -76,7 +76,7 @@ const Home = () => {
     setSearchQuery(queryParams.get("search") || "");
     const fetchFoods = async () => {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_BASE_URL}/foods?${queryParams.toString()}`,
+        `${import.meta.env.VITE_SERVER_BASE_URL}/foods${queryParams.toString() ? `?${queryParams.toString()}` : ""}`,
       );
       const data = await response.json();
       setFetchedFoods(data);
@@ -147,13 +147,14 @@ const Home = () => {
         );
       }
     },
-    { dependencies: [fetchedFoods.data.length] },
+    { dependencies: [fetchedFoods.data.length, location.search] },
   );
 
   useGSAP(
     () => {
+      const isHomePage = queryParams.toString() === "";
       if (
-        queryParams.toString() === "" &&
+        isHomePage &&
         !initialLoadContext.initialLoadAlreadyHappened?.current
       ) {
         gsap.set(".countryRegionFilter", {

@@ -1,3 +1,5 @@
+import { uploadImageRequest } from "./apiCalls";
+
 export function summarizeCulturalStory(
   text: string,
   targetLength = 200,
@@ -67,4 +69,20 @@ export const getWithExpiry = (key: string) => {
     return null;
   }
   return item.value; // Return the valid value
+};
+
+export const uploadImage = async (
+  image: File,
+): Promise<{ image: string } | null> => {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const response = await uploadImageRequest(formData);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Upload failed: ${response.status} — ${errorText}`);
+    }
+
+    return await response.json();
 };

@@ -12,16 +12,17 @@ import FoodVideoPlayer from "../components/FoodVideoPlayer";
 import { useEffect, useMemo, useRef, useState } from "react";
 import PopUpModal from "../components/PopUpModal";
 import NotFound from "./NotFound";
+import SingleFoodLoading from "../components/loadings/SingleFoodLoading";
 import type { IFood, IFoodVideo } from "../types/food";
 import type { IInfluencers } from "../types/influencers";
 
 const FoodVideos = () => {
   const [isVideoPlayeropen, setIsVideoPlayeropen] = useState<boolean>(false);
-  const [isInfluencerModalOpen, setIsInfluencerModalOpen] =
-    useState<boolean>(false);
+  const [isInfluencerModalOpen, setIsInfluencerModalOpen] = useState<boolean>(false);
   const [selectedInfluencer, setSelectedInfluencer] = useState<string>("");
-  const [foodVideos, setFoodVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [foodVideos, setFoodVideos] = useState<IFoodVideo[]>([]);
+  const [isFoodLoading, setIsFoodLoading] = useState(true);
+  const [isVideosLoading, setIsVideosLoading] = useState(true);
   const [error, setError] = useState(false);
   const [selectedVideoId, setSelectedVideoId] = useState<string>("");
   const [foodInfluencers, setFoodInfluencers] = useState<
@@ -45,39 +46,36 @@ const FoodVideos = () => {
 
   useEffect(() => {
     const fetchFood = async () => {
-      setLoading(true);
+      setIsFoodLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_BASE_URL}/foods/${id}`,
       );
       if (!response.ok) {
-        setLoading(false);
         setError(true);
-        return;
+      } else {
+        const data = await response.json();
+        setFetchedFood(data);
       }
-      const data = await response.json();
-      setFetchedFood(data);
-      setLoading(false);
+      setIsFoodLoading(false);
     };
     fetchFood();
   }, [id]);
 
-  // Get foods from API
   useEffect(() => {
-    const fetchFood = async () => {
-      setLoading(true);
+    const fetchFoodVideos = async () => {
+      setIsVideosLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_SERVER_BASE_URL}/foods/${id}/influencers?${queryParams.toString()}`,
       );
       if (!response.ok) {
-        setLoading(false);
         setError(true);
-        return;
+      } else {
+        const data = await response.json();
+        setFoodVideos(data);
       }
-      const data = await response.json();
-      setFoodVideos(data);
-      setLoading(false);
+      setIsVideosLoading(false);
     };
-    fetchFood();
+    fetchFoodVideos();
   }, [id, queryParams]);
 
   useEffect(() => {
@@ -90,60 +88,43 @@ const FoodVideos = () => {
         return;
       }
       const data = await response.json();
-      const influencers = data.map((influencer: IInfluencers) => {
-        return { _id: influencer._id, name: influencer.name };
-      });
-      setFoodInfluencers([
-        {
-          _id: "",
-          name: "all influencers",
-        },
-        ...influencers,
-      ]);
+      const influencers = data.map((influencer: IInfluencers) => ({
+        _id: influencer._id,
+        name: influencer.name,
+      }));
+      setFoodInfluencers([{ _id: "", name: "all influencers" }, ...influencers]);
     };
     fetchInfluencers();
   }, []);
 
-  console.log(foodInfluencers);
-
   useEffect(() => {
     if (!foodInfluencers.length) return;
-
     const influencerId = queryParams.get("influencerId");
     const urlInfluencer = foodInfluencers.find((fi) => fi._id === influencerId);
-
-    if (!urlInfluencer) return;
-
-    setSelectedInfluencer(urlInfluencer?.name || "");
+    if (urlInfluencer) setSelectedInfluencer(urlInfluencer.name);
   }, [foodInfluencers, queryParams]);
 
-  // const creators = [
-  //   "All creators",
-  //   "Chef Abby",
-  //   "Chef John",
-  //   "Chef Jane",
-  //   "Chef Jim",
-  //   "Chef Jill",
-  //   "Chef Jack",
-  // ];
-
   const onCreatorChange = (creator: string) => {
-    if (creator === "all creators") {
+    setSelectedInfluencer(creator);
+
+    if (creator === "all influencers") {
       newSearchParams.delete("influencerId");
       setSearchParams(newSearchParams);
+      return;
     }
+
     const chosenInfluencer = foodInfluencers.find(
       (fi) => fi.name.toLocaleLowerCase() === creator.toLocaleLowerCase(),
     );
-    newSearchParams.set("influencerId", chosenInfluencer?._id as string);
-    setSearchParams(newSearchParams);
-    setSelectedInfluencer(creator);
+    if (chosenInfluencer) {
+      newSearchParams.set("influencerId", chosenInfluencer._id);
+      setSearchParams(newSearchParams);
+    }
   };
 
   useGSAP(
     () => {
       if (!foodVideos.length) return;
-
       gsap.from(".foodVideoCard", {
         y: 300,
         ease: "power3.out",
@@ -159,68 +140,34 @@ const FoodVideos = () => {
     () => {
       if (isInfluencerModalOpen && selectInfluencerButtonRef.current) {
         const tl = gsap.timeline();
-        tl.from(selectInfluencerModalRef.current, {
-          y: -40,
-          opacity: 0,
-        });
+        tl.from(selectInfluencerModalRef.current, { y: -40, opacity: 0 });
         tl.from(selectInfluencerModalBackgroundRef.current, {
           opacity: 0,
           duration: 0.5,
         });
       }
     },
-    {
-      dependencies: [isInfluencerModalOpen],
-    },
+    { dependencies: [isInfluencerModalOpen] },
   );
 
-  const toggleVideoPlayer = (value: boolean) => {
-    setIsVideoPlayeropen(value);
-  };
+  const toggleVideoPlayer = (value: boolean) => setIsVideoPlayeropen(value);
 
   useGSAP(
     () => {
-      gsap.set("#noVideoText1", {
-        x: -2000,
-        opacity: 0,
-      });
-      gsap.set("#noVideoText2", {
-        x: 2000,
-        opacity: 0,
-      });
-      gsap.set("#noVideoText3", {
-        x: -2000,
-        opacity: 0,
-      });
+      gsap.set("#noVideoText1", { x: -2000, opacity: 0 });
+      gsap.set("#noVideoText2", { x: 2000, opacity: 0 });
+      gsap.set("#noVideoText3", { x: -2000, opacity: 0 });
 
-      const noVideoTextTl = gsap.timeline();
-      noVideoTextTl.to("#noVideoText1", {
-        x: 0,
-        opacity: 1,
-        duration: 0.2,
-        ease: "bounce.out",
-      });
-
-      noVideoTextTl.to("#noVideoText2", {
-        x: 0,
-        opacity: 1,
-        duration: 0.2,
-        ease: "bounce.out",
-      });
-
-      noVideoTextTl.to("#noVideoText3", {
-        x: 0,
-        opacity: 1,
-        duration: 0.2,
-        ease: "bounce.out",
-      });
+      const tl = gsap.timeline();
+      tl.to("#noVideoText1", { x: 0, opacity: 1, duration: 0.2, ease: "bounce.out" });
+      tl.to("#noVideoText2", { x: 0, opacity: 1, duration: 0.2, ease: "bounce.out" });
+      tl.to("#noVideoText3", { x: 0, opacity: 1, duration: 0.2, ease: "bounce.out" });
     },
     { dependencies: [foodVideos], scope: noVideoTextRef },
   );
 
-  if (loading) {
-    // return <SingleFoodLoading />;
-    return "Loading";
+  if (isFoodLoading || isVideosLoading) {
+    return <SingleFoodLoading />;
   }
 
   if (error) {
@@ -250,9 +197,7 @@ const FoodVideos = () => {
         </button>
         {isInfluencerModalOpen && (
           <PopUpModal
-            elements={foodInfluencers.map((foodInfluencer) =>
-              foodInfluencer.name.toLocaleLowerCase(),
-            )}
+            elements={foodInfluencers.map((fi) => fi.name.toLocaleLowerCase())}
             onChangeElement={onCreatorChange}
             selectModalBackgroundRef={selectInfluencerModalBackgroundRef}
             selectModalRef={selectInfluencerModalRef}
@@ -264,25 +209,18 @@ const FoodVideos = () => {
       </div>
       <div className="flex w-full flex-wrap items-start justify-center gap-7 mb-20">
         {!foodVideos.length && (
-          <div
-            className="mt-30 min-h-screen text-center"
-            ref={noVideoTextRef}
-          >
-            <p className="my-7 text-5xl font-black" id="noVideoText1">
-              No videos
-            </p>
-            <p className="my-7 text-5xl font-black" id="noVideoText2">
-              for this
-            </p>
-            <p className="my-7 text-5xl font-black" id="noVideoText3">
-              food / influencer
-            </p>
+          <div className="mt-30 min-h-screen text-center" ref={noVideoTextRef}>
+            <p className="my-7 text-5xl font-black" id="noVideoText1">No videos</p>
+            <p className="my-7 text-5xl font-black" id="noVideoText2">for this</p>
+            <p className="my-7 text-5xl font-black" id="noVideoText3">food / influencer</p>
           </div>
         )}
         {foodVideos.map((foodVideo: IFoodVideo) => (
-          <div onClick={() => setSelectedVideoId(foodVideo.videoId)}>
+          <div
+            key={foodVideo.videoId}
+            onClick={() => setSelectedVideoId(foodVideo.videoId)}
+          >
             <FoodVideoCard
-              key={foodVideo.videoId}
               imageUrl={foodVideo.videoThumbnailUrl}
               title={foodVideo.videoTitle}
               influencerId={foodVideo.influencer._id}
