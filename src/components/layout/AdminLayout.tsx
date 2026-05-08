@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import AdminNavbar from "../admin/AdminNavbar";
+import Navbar from "../Navbar";
 import { Outlet, useLocation } from "react-router-dom";
 import backgroundAfrica from "../../assets/backgroundAfrica.png";
 
@@ -12,13 +12,12 @@ const AdminLayout = () => {
 
   return (
     <section
-      className=""
       style={{
         backgroundImage: `url(${backgroundAfrica})`,
         backgroundSize: "900px",
       }}
     >
-      <AdminNavbar />
+      <Navbar basePath="/admin" />
       <main className="mx-auto w-full px-4">
         <Outlet />
       </main>

@@ -13,15 +13,12 @@ import {
 } from "../../utils/helpers/apiCalls";
 
 const AdminHome = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [fetchedFoods, setFetchedFoods] = useState<IPaginatedResponse<IFood[]>>(
-    {
-      data: [],
-      totalpages: 0,
-      page: 0,
-      totalItems: 0,
-    },
-  );
+  const [fetchedFoods, setFetchedFoods] = useState<IPaginatedResponse<IFood[]>>({
+    data: [],
+    totalpages: 0,
+    page: 0,
+    totalItems: 0,
+  });
   const [selectedFoodId, setSelectedFoodId] = useState<string>();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const selectModalBackgroundRef = useRef<HTMLDivElement>(null);
@@ -29,12 +26,19 @@ const AdminHome = () => {
   const [updateFoodData, setUpdateFoodData] = useState<IFoodRequest>();
   const [refetchTrigger, setRefetchTrigger] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [selectedFood, setSelectedFood] = useState<IFood | undefined>(
-    undefined,
-  );
-  const [pageQuery, setPageQuery] = useState<number>(1);
+  const [operationError, setOperationError] = useState<string>("");
+  const [selectedFood, setSelectedFood] = useState<IFood | undefined>(undefined);
   const [searchParams, setSearchParams] = useSearchParams();
-  const newSearchParams = new URLSearchParams(searchParams);
+
+  const location = useLocation();
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search],
+  );
+
+  // Derived from URL — no need for separate state
+  const searchQuery = queryParams.get("search") || "";
+  const pageQuery = Number(queryParams.get("page")) || 1;
 
   const updateSelectedFood = (foodId: string) => {
     setSelectedFoodId(foodId);
@@ -43,204 +47,153 @@ const AdminHome = () => {
     setIsModalOpen(true);
   };
 
-  const location = useLocation();
-  const queryParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search],
-  );
-
-  // Get foods from API
   useEffect(() => {
-    setSearchQuery(queryParams.get("search") || "");
-    setPageQuery(Number(queryParams.get("page")) || 1);
     const fetchFoods = async () => {
       try {
         const response = await fetch(
           `${import.meta.env.VITE_SERVER_BASE_URL}/foods?${queryParams.toString()}`,
         );
+        if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
         const data = await response.json();
         setFetchedFoods(data);
-      } catch (error) {
-        console.error("Error fetching foods:", error);
+      } catch {
+        setOperationError("Failed to load foods. Please refresh the page.");
       }
     };
     fetchFoods();
-  }, [location.search, queryParams, refetchTrigger]);
+  }, [location.search, refetchTrigger]);
 
-  // Create food when createFoodData is set
   useEffect(() => {
     if (!createFoodData) return;
-    console.log(createFoodData);
-
-    // Prevent race conditions
     let isCancelled = false;
 
     const createFood = async () => {
       try {
-        // Validate required data
-        if (
-          !createFoodData.image ||
-          !createFoodData.countries ||
-          !createFoodData.ingredients
-        ) {
+        if (!createFoodData.image || !createFoodData.countries || !createFoodData.ingredients) {
           throw new Error("Missing required fields");
         }
 
-        const imageUrl = await uploadImage(createFoodData.image);
-
-        if (isCancelled) return; // Check after async operation
-
-        if (!imageUrl?.image) {
-          throw new Error("Image upload returned invalid response");
-        }
+        const imageResult = await uploadImage(createFoodData.image);
+        if (isCancelled) return;
+        if (!imageResult?.image) throw new Error("Image upload returned no URL");
 
         const preparedData = {
           ...createFoodData,
-          imageUrl: imageUrl.image,
+          imageUrl: imageResult.image,
           countries: createFoodData.countries.split(",").map((c) => c.trim()),
-          ingredients: createFoodData.ingredients
-            .split(",")
-            .map((i) => i.trim()),
+          ingredients: createFoodData.ingredients.split(",").map((i) => i.trim()),
         };
 
-        console.log(preparedData);
         const response = await createFoodRequest(preparedData);
-
-        if (isCancelled) return; // Check after async operation
-
+        if (isCancelled) return;
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(
-            `Failed to create food: ${response.status} - ${errorText}`,
-          );
+          throw new Error(`Failed to create food: ${response.status} — ${errorText}`);
         }
-        await response.json();
 
-        // Success
         setRefetchTrigger((prev) => prev + 1);
         setIsLoading(false);
-        // Consider adding success toast/notification here
+        setOperationError("");
       } catch (error) {
         if (isCancelled) return;
-
-        console.error("Error creating food:", error);
-        // TODO: Show error to user (toast, alert, error state, etc.)
-        // Example: setError(error instanceof Error ? error.message : "Failed to create food");
+        setIsLoading(false);
+        setOperationError(error instanceof Error ? error.message : "Failed to create food");
       } finally {
-        if (!isCancelled) {
-          setCreateFoodData(undefined);
-        }
+        if (!isCancelled) setCreateFoodData(undefined);
         setIsModalOpen(false);
         setSelectedFood(undefined);
       }
     };
 
     createFood();
+    return () => { isCancelled = true; };
+  }, [createFoodData]);
 
-    // Cleanup function
-    return () => {
-      isCancelled = true;
-    };
-  }, [createFoodData, setRefetchTrigger]); // Add all dependencies
-
-  // Create food when createFoodData is set
   useEffect(() => {
     if (!updateFoodData) return;
-    console.log(updateFoodData);
-
-    // Prevent race conditions
     let isCancelled = false;
 
     const updateFood = async () => {
       try {
-        // Validate required data
-        if (
-          !updateFoodData.image ||
-          !updateFoodData.countries ||
-          !updateFoodData.ingredients
-        ) {
-          throw new Error("Missing required fields");
-        }
+        let imageUrl = selectedFood?.imageUrl ?? "";
 
-        const imageUrl = await uploadImage(updateFoodData.image);
-
-        if (isCancelled) return; // Check after async operation
-
-        if (!imageUrl?.image) {
-          throw new Error("Image upload returned invalid response");
+        if (updateFoodData.image) {
+          const imageResult = await uploadImage(updateFoodData.image);
+          if (isCancelled) return;
+          if (!imageResult?.image) throw new Error("Image upload returned no URL");
+          imageUrl = imageResult.image;
         }
 
         const preparedData = {
           ...updateFoodData,
-          imageUrl: imageUrl.image,
-          countries: updateFoodData.countries.split(",").map((c) => c.trim()),
-          ingredients: updateFoodData.ingredients
-            .split(",")
-            .map((i) => i.trim()),
+          imageUrl,
+          countries: (updateFoodData.countries as string).split(",").map((c) => c.trim()),
+          ingredients: (updateFoodData.ingredients as string).split(",").map((i) => i.trim()),
         };
 
-        console.log(preparedData);
-
         const response = await updateFoodRequest(preparedData, selectedFoodId);
-
-        if (isCancelled) return; // Check after async operation
-
+        if (isCancelled) return;
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(
-            `Failed to create food: ${response.status} - ${errorText}`,
-          );
+          throw new Error(`Failed to update food: ${response.status} — ${errorText}`);
         }
-        await response.json();
 
-        // Success
         setRefetchTrigger((prev) => prev + 1);
         setIsLoading(false);
-        // Consider adding success toast/notification here
+        setOperationError("");
       } catch (error) {
         if (isCancelled) return;
-
-        console.error("Error creating food:", error);
-        // TODO: Show error to user (toast, alert, error state, etc.)
-        // Example: setError(error instanceof Error ? error.message : "Failed to create food");
+        setIsLoading(false);
+        setOperationError(error instanceof Error ? error.message : "Failed to update food");
       } finally {
-        if (!isCancelled) {
-          setUpdateFoodData(undefined);
-        }
+        if (!isCancelled) setUpdateFoodData(undefined);
         setIsModalOpen(false);
         setSelectedFood(undefined);
       }
     };
 
     updateFood();
-
-    // Cleanup function
-    return () => {
-      isCancelled = true;
-    };
-  }, [updateFoodData, setRefetchTrigger]); // Add all dependencies
+    return () => { isCancelled = true; };
+  }, [updateFoodData, selectedFoodId, selectedFood]);
 
   async function deleteFood() {
     const confirmDeletion = confirm("You are deleting this food item!");
     if (!confirmDeletion) return;
 
-    const response = await deleteFoodRequest(selectedFood?._id);
-    if (response.ok) {
-      console.log("Deleting...");
-      if (fetchedFoods.data.length % 10 < pageQuery && pageQuery > 1) {
-        newSearchParams.set("page", (pageQuery - 1).toString());
-        setSearchParams(newSearchParams);
+    try {
+      const response = await deleteFoodRequest(selectedFood?._id);
+      if (!response.ok) throw new Error(`Delete failed: ${response.status}`);
+      if (fetchedFoods.data.length === 1 && pageQuery > 1) {
+        // Snapshot searchParams at call time, not at render time
+        const freshParams = new URLSearchParams(searchParams);
+        freshParams.set("page", (pageQuery - 1).toString());
+        setSearchParams(freshParams);
       }
       setRefetchTrigger((prev) => prev + 1);
-    } else {
-      console.log("An error occured");
+      setOperationError("");
+    } catch (error) {
+      setOperationError(error instanceof Error ? error.message : "Failed to delete food");
+    } finally {
+      setIsModalOpen(false);
     }
-    setIsModalOpen(false);
   }
 
   return (
     <section className="min-h-screen pt-2">
       <CountryRegionFilter className="countryRegionFilter" />
+
+      {operationError && (
+        <div className="mx-auto my-3 max-w-xl rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          {operationError}
+          <button
+            onClick={() => setOperationError("")}
+            className="ml-3 font-bold hover:underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {searchQuery && (
         <div className="my-5">
           Search Results for:{" "}
@@ -252,6 +205,7 @@ const AdminHome = () => {
           className="rounded-lg bg-orange-200 px-6 py-2 font-bold text-orange-800 hover:cursor-pointer hover:bg-orange-300"
           onClick={() => {
             setSelectedFood(undefined);
+            setOperationError("");
             setIsModalOpen(true);
           }}
         >

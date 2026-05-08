@@ -5,24 +5,25 @@ import woodenSpoonCursor from "/wooden_spoon_cursor.png";
 import type { IFood } from "../types/food";
 import { summarizeCulturalStory } from "../utils/helpers/general";
 
-const FoodCard = ({ food }: { food: IFood }) => {
+const FoodCard = ({
+  food,
+  isAdminView,
+  updateSelectedFood,
+}: {
+  food: IFood;
+  isAdminView?: boolean;
+  updateSelectedFood?: (foodId: string) => void;
+}) => {
   const foodBoxScopeRef = useRef<HTMLDivElement>(null);
   const darkOverlayRef = useRef<HTMLDivElement>(null);
   const foodDetailsRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      // Set initial states
       gsap.set(foodDetailsRef.current, { opacity: 0, y: -10 });
       gsap.set(darkOverlayRef.current, { opacity: 0.7 });
+      gsap.to(darkOverlayRef.current, { opacity: 0.4, duration: 0.5 });
 
-      // Initial subtle fade-in for dark overlay
-      gsap.to(darkOverlayRef.current, {
-        opacity: 0.4,
-        duration: 0.5,
-      });
-
-      // Hover animations
       const darkOverlayAnimation = gsap.to(darkOverlayRef.current, {
         paused: true,
         opacity: 0,
@@ -37,26 +38,22 @@ const FoodCard = ({ food }: { food: IFood }) => {
         ease: "power2.out",
       });
 
-      foodBoxScopeRef.current?.addEventListener("mouseenter", () => {
+      // Store named handlers so removeEventListener receives the same reference
+      const onMouseEnter = () => {
         darkOverlayAnimation.play();
         overlayTextAnimation.play();
-      });
-
-      foodBoxScopeRef.current?.addEventListener("mouseleave", () => {
+      };
+      const onMouseLeave = () => {
         darkOverlayAnimation.reverse();
         overlayTextAnimation.reverse();
-      });
+      };
+
+      foodBoxScopeRef.current?.addEventListener("mouseenter", onMouseEnter);
+      foodBoxScopeRef.current?.addEventListener("mouseleave", onMouseLeave);
 
       return () => {
-        foodBoxScopeRef.current?.removeEventListener("mouseenter", () => {
-          darkOverlayAnimation.play();
-          overlayTextAnimation.play();
-        });
-
-        foodBoxScopeRef.current?.removeEventListener("mouseleave", () => {
-          darkOverlayAnimation.reverse();
-          overlayTextAnimation.reverse();
-        });
+        foodBoxScopeRef.current?.removeEventListener("mouseenter", onMouseEnter);
+        foodBoxScopeRef.current?.removeEventListener("mouseleave", onMouseLeave);
       };
     },
     { scope: foodBoxScopeRef },
@@ -68,10 +65,20 @@ const FoodCard = ({ food }: { food: IFood }) => {
       className="relative h-96 rounded-xl bg-gray-400"
       style={{ cursor: `url(${woodenSpoonCursor}), auto` }}
     >
+      {isAdminView && (
+        <div className="absolute top-0 z-20 right-0">
+          <button
+            onClick={() => updateSelectedFood?.(food._id)}
+            className="rounded-md rounded-tr-xl rounded-tl-none rounded-br-none bg-orange-400 px-5 py-2 text-white hover:cursor-pointer hover:bg-orange-500"
+          >
+            Edit
+          </button>
+        </div>
+      )}
       <img
         src={food.imageUrl}
         alt={food.name}
-        className={`h-full w-full rounded-xl object-cover object-center`}
+        className="h-full w-full rounded-xl object-cover object-center"
       />
       <div
         ref={darkOverlayRef}

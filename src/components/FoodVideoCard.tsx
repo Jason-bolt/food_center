@@ -24,7 +24,7 @@ const FoodVideoCard = ({
 
   const processedDate = useMemo(() => {
     const dateObject = new Date(publishedAt);
-    return dateObject.toDateString();
+    return dateObject.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   }, [publishedAt]);
 
   useGSAP(() => {

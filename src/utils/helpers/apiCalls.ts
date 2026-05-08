@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { authHeaders } from "../auth";
 
 // ########## FOOD REQUESTS ##########
 export const createFoodRequest = async (preparedData: Record<string, any>) => {
@@ -8,6 +9,7 @@ export const createFoodRequest = async (preparedData: Record<string, any>) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...authHeaders(),
       },
       body: JSON.stringify(preparedData),
     },
@@ -26,6 +28,7 @@ export const updateFoodRequest = async (
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        ...authHeaders(),
       },
       body: JSON.stringify(preparedData),
     },
@@ -43,6 +46,7 @@ export const deleteFoodRequest = async (
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
+        ...authHeaders(),
       },
     },
   );
@@ -56,6 +60,9 @@ export const uploadImageRequest = async (formData: FormData) => {
     `${import.meta.env.VITE_SERVER_BASE_URL}/upload`,
     {
       method: "POST",
+      headers: {
+        ...authHeaders(),
+      },
       body: formData,
     },
   );

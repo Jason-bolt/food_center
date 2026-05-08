@@ -12,7 +12,12 @@ import {
 import { FoodSectionContext } from "../contexts/FoodSectionContext";
 import { InitialLoadContext } from "../contexts/InitialLoadContext";
 
-const Navbar = () => {
+interface NavbarProps {
+  basePath?: string;
+}
+
+const Navbar = ({ basePath = "/" }: NavbarProps) => {
+  const isAdmin = basePath !== "/";
   const navSection = useRef<HTMLElement>(null);
   const searchModalRef = useRef<HTMLDivElement>(null);
   const searchModalBackgroundRef = useRef<HTMLDivElement>(null);
@@ -25,10 +30,8 @@ const Navbar = () => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const newSearchParams = new URLSearchParams(searchParams);
-
   const currentPath = location.pathname;
   const queryParams = new URLSearchParams(location.search);
-
   const initialLoadContext = useContext(InitialLoadContext);
   const navigate = useNavigate();
 
@@ -39,50 +42,32 @@ const Navbar = () => {
 
   useGSAP(
     () => {
-      // Navbar animation
       if (
+        !isAdmin &&
         currentPath === "/" &&
         queryParams.toString() === "" &&
         !initialLoadContext.initialLoadAlreadyHappened?.current
       ) {
-        gsap.fromTo(
-          navSection.current,
-          {
-            autoAlpha: 0,
-          },
-          {
-            autoAlpha: 1,
-            delay: 2,
-          },
-        );
+        gsap.fromTo(navSection.current, { autoAlpha: 0 }, { autoAlpha: 1, delay: 2 });
       }
     },
     { dependencies: [currentPath] },
   );
 
-  // Animate modal when it opens
   useGSAP(
     () => {
       if (isSearchModalOpen && searchModalRef.current) {
         const tl = gsap.timeline();
-        tl.from(searchModalRef.current, {
-          y: -40,
-          opacity: 0,
-        });
-        tl.from(searchModalBackgroundRef.current, {
-          opacity: 0,
-          duration: 0.5,
-        });
+        tl.from(searchModalRef.current, { y: -40, opacity: 0 });
+        tl.from(searchModalBackgroundRef.current, { opacity: 0, duration: 0.5 });
       }
     },
-    {
-      dependencies: [isSearchModalOpen],
-    },
+    { dependencies: [isSearchModalOpen] },
   );
 
   useGSAP(
     () => {
-      const submitSeachForm = () => {
+      const submitSearchForm = () => {
         setIsSearchModalOpen(false);
         gsap.to(foodSectionRef!.current, {
           y: 30,
@@ -95,35 +80,21 @@ const Navbar = () => {
               setIsSearchModalOpen(false);
             }
 
-            console.log("CURERNT PATH", currentPath);
-
-            if (currentPath === "/") {
+            if (currentPath === basePath) {
               newSearchParams.set("search", localSearchQuery);
               setSearchParams(newSearchParams);
               setIsSearchModalOpen(false);
             } else {
-              const queryString = createSearchParams({
-                search: localSearchQuery,
-              }).toString();
-              navigate(
-                {
-                  pathname: "/",
-                  search: `?${queryString}`,
-                },
-                { replace: true },
-              );
+              const queryString = createSearchParams({ search: localSearchQuery }).toString();
+              navigate({ pathname: basePath, search: `?${queryString}` }, { replace: true });
             }
           },
         });
       };
 
-      searchButtonSubmitRef.current?.addEventListener("click", submitSeachForm);
-
+      searchButtonSubmitRef.current?.addEventListener("click", submitSearchForm);
       return () => {
-        searchButtonSubmitRef.current?.removeEventListener(
-          "click",
-          submitSeachForm,
-        );
+        searchButtonSubmitRef.current?.removeEventListener("click", submitSearchForm);
       };
     },
     { dependencies: [isSearchModalOpen, localSearchQuery, searchParams] },
@@ -136,10 +107,15 @@ const Navbar = () => {
     >
       <section className="flex items-center justify-between px-10 py-5">
         <Link
-          to={"/"}
+          to={basePath}
           className="text-xl font-bold uppercase italic transition-all duration-200 hover:scale-105 hover:cursor-pointer hover:opacity-80"
         >
           <span className="text-orange-500">FOOD CENTER</span>
+          {isAdmin ? (
+            <span className="text-orange-600"> - ADMIN</span>
+          ) : (
+            <>&nbsp;<span className="text-sm text-orange-600">(AFRICA)</span></>
+          )}
         </Link>
 
         <div
@@ -152,46 +128,30 @@ const Navbar = () => {
         </div>
       </section>
 
-      {/* Search Modal */}
       {isSearchModalOpen && (
         <div
           ref={searchModalRef}
           className="fixed inset-0 z-50 flex items-start justify-center pt-28"
         >
-          {/* Backdrop with blur effect */}
           <div
             className="absolute inset-0 bg-black/10 backdrop-blur-md"
             onClick={() => setIsSearchModalOpen(false)}
             ref={searchModalBackgroundRef}
           />
-
-          {/* Modal Container */}
           <div className="relative mx-4 w-full max-w-md">
-            {/* Glass Container */}
             <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
               <div className="absolute inset-0 bg-gray-200 opacity-90" />
-
-              {/* Content */}
               <div className="relative p-8">
-                {/* Close button */}
                 <button
                   onClick={() => setIsSearchModalOpen(false)}
                   className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-all duration-200 hover:cursor-pointer hover:bg-white/10 hover:text-gray-600"
                 >
                   <X size={20} />
                 </button>
-
-                {/* Modal Header */}
                 <div className="mb-6 text-center">
-                  <h2 className="mb-2 text-2xl font-bold text-gray-800">
-                    Search Food
-                  </h2>
-                  <p className="text-gray-600">
-                    Discover amazing recipes and ingredients
-                  </p>
+                  <h2 className="mb-2 text-2xl font-bold text-gray-800">Search Food</h2>
+                  <p className="text-gray-600">Discover amazing recipes and ingredients</p>
                 </div>
-
-                {/* Search Input */}
                 <div className="mb-6">
                   <div className="relative">
                     <input
@@ -207,8 +167,6 @@ const Navbar = () => {
                     />
                   </div>
                 </div>
-
-                {/* Action Buttons */}
                 <div className="flex gap-3">
                   <button
                     ref={searchButtonSubmitRef}
@@ -223,7 +181,6 @@ const Navbar = () => {
         </div>
       )}
 
-      <div className="absolute z-20"></div>
     </nav>
   );
 };

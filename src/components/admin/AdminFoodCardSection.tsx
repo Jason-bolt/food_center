@@ -32,12 +32,16 @@ const AdminFoodCardSection = ({
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         {data.map((food) => (
           <div
-            onClick={() => updateSelectedFood(food._id)}
+            // onClick={() => updateSelectedFood(food._id)}
             id={food._id}
             key={food._id}
             className=""
           >
-            <FoodCard food={food} />
+            <FoodCard
+              food={food}
+              isAdminView={true}
+              updateSelectedFood={updateSelectedFood}
+            />
           </div>
         ))}
       </div>

@@ -1,7 +1,13 @@
 import { useForm } from "react-hook-form";
 import type { IFood, IFoodRequest } from "../../types/food";
 import { LoaderPinwheel, Trash, X } from "lucide-react";
-import type { RefObject, Dispatch, SetStateAction } from "react";
+import {
+  useEffect,
+  useRef,
+  type RefObject,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 
 interface FoodModalProps {
   selectModalBackgroundRef: RefObject<HTMLDivElement | null>;
@@ -28,7 +34,48 @@ const FoodModal = ({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: selectedFood
+      ? {
+          name: selectedFood.name,
+          description: selectedFood.description,
+          culturalStory: selectedFood.culturalStory,
+          countries: selectedFood.countries.join(","),
+          region: selectedFood.region,
+          ingredients: selectedFood.ingredients.join(","),
+        }
+      : {},
+  });
+
+  const previewRef = useRef<HTMLImageElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // Destructure register's ref so we can merge it with our local inputRef.
+  const { ref: rhfImageRef, ...imageProps } = register("image");
+
+  useEffect(() => {
+    const input = inputRef.current;
+    if (!input) return;
+
+    const handleChange = (event: Event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      const preview = previewRef.current;
+      if (!preview) return;
+
+      if (file) {
+        const fileURL = URL.createObjectURL(file);
+        preview.src = fileURL;
+        preview.style.display = "block";
+        preview.onload = () => URL.revokeObjectURL(fileURL);
+      } else {
+        preview.style.display = "none";
+        preview.src = "#";
+      }
+    };
+
+    input.addEventListener("change", handleChange);
+    return () => input.removeEventListener("change", handleChange);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16">
@@ -38,7 +85,7 @@ const FoodModal = ({
         onClick={() => setIsModalOpen(false)}
       />
 
-      <div className="relative mx-4 w-full max-w-xl">
+      <div className="relative mx-4 -mt-5 w-full max-w-xl">
         <div className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/20 shadow-2xl backdrop-blur-xl">
           <div className="absolute inset-0 bg-gray-100 opacity-90" />
 
@@ -52,22 +99,29 @@ const FoodModal = ({
 
             <div className="text-center">
               <h2 className="mb-2 text-2xl font-bold text-gray-800">
-                Add Food
+                Add/Edit Food
               </h2>
-
+              {selectedFood ? (
+                <p className="text-sm text-gray-600">
+                  Editing food: {selectedFood.name}
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600">Adding new food</p>
+              )}
               <form
                 className="form"
                 onSubmit={handleSubmit((data) => {
-                  setIsLoading(true);
-                  // Extract the File from FileList for file inputs
                   const fileList = data.image as FileList;
-                  if (!fileList || fileList.length === 0) {
-                    console.error("No image file selected");
-                    return;
-                  }
+                  const hasNewImage = fileList && fileList.length > 0;
+
+                  // On create, an image is required
+                  if (!selectedFood && !hasNewImage) return;
+
+                  setIsLoading(true);
+
                   const formData = {
                     ...data,
-                    image: fileList[0],
+                    image: hasNewImage ? fileList[0] : undefined,
                   } as IFoodRequest;
 
                   if (selectedFood) {
@@ -75,7 +129,6 @@ const FoodModal = ({
                   } else {
                     setCreateFoodData(formData);
                   }
-                  console.log(formData);
                 })}
               >
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
@@ -85,10 +138,7 @@ const FoodModal = ({
                   <input
                     type="text"
                     id="name"
-                    {...register("name", {
-                      required: "Name is required",
-                    })}
-                    value={selectedFood?.name}
+                    {...register("name", { required: "Name is required" })}
                     className="w-full rounded-lg border border-orange-400 p-2"
                   />
                   {errors.name && (
@@ -97,46 +147,69 @@ const FoodModal = ({
                     </p>
                   )}
                 </div>
+
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
                   <label htmlFor="description" className="font-semibold">
                     Food description
                   </label>
                   <textarea
                     id="description"
+                    rows={5}
                     {...register("description", {
                       required: "Description is required",
                     })}
-                    value={selectedFood?.description}
                     className="w-full rounded-lg border border-orange-400 p-2"
-                  ></textarea>
+                  />
                   {errors.description && (
                     <p className="text-sm text-red-600">
                       {errors.description.message as string}
                     </p>
                   )}
                 </div>
+
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
                   <label htmlFor="culturalStory" className="font-semibold">
                     Cultural story
                   </label>
                   <textarea
                     id="culturalStory"
-                    {...register("culturalStory")}
+                    rows={5}
+                    {...register("culturalStory", {
+                      required: "Cultural story is required",
+                    })}
                     className="w-full rounded-lg border border-orange-400 p-2"
-                    value={selectedFood?.culturalStory}
-                  ></textarea>
+                  />
+                  {errors.culturalStory && (
+                    <p className="text-sm text-red-600">
+                      {errors.culturalStory.message as string}
+                    </p>
+                  )}
                 </div>
+
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
                   <label htmlFor="image" className="font-semibold">
-                    Food image URL
+                    Food image{selectedFood ? " (leave blank to keep current)" : ""}
                   </label>
                   <input
                     type="file"
                     id="image"
+                    accept="image/*"
                     className="w-full rounded-lg border border-orange-400 p-2"
-                    {...register("image")}
+                    {...imageProps}
+                    ref={(el) => {
+                      rhfImageRef(el);
+                      inputRef.current = el;
+                    }}
+                  />
+                  <img
+                    ref={previewRef}
+                    alt="Preview"
+                    className="max-w-40"
+                    src={selectedFood?.imageUrl}
+                    style={{ display: selectedFood?.imageUrl ? "block" : "none" }}
                   />
                 </div>
+
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
                   <label htmlFor="countries" className="font-semibold">
                     Countries
@@ -146,10 +219,17 @@ const FoodModal = ({
                     id="countries"
                     className="w-full rounded-lg border border-orange-400 px-2 py-3"
                     placeholder="ghana,nigeria,togo"
-                    value={selectedFood?.countries.join(",")}
-                    {...register("countries")}
+                    {...register("countries", {
+                      required: "At least one country is required",
+                    })}
                   />
+                  {errors.countries && (
+                    <p className="text-sm text-red-600">
+                      {errors.countries.message as string}
+                    </p>
+                  )}
                 </div>
+
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
                   <label htmlFor="region" className="font-semibold">
                     Region
@@ -159,10 +239,15 @@ const FoodModal = ({
                     id="region"
                     className="w-full rounded-lg border border-orange-400 px-2 py-3"
                     placeholder="region"
-                    value={selectedFood?.region}
-                    {...register("region")}
+                    {...register("region", { required: "Region is required" })}
                   />
+                  {errors.region && (
+                    <p className="text-sm text-red-600">
+                      {errors.region.message as string}
+                    </p>
+                  )}
                 </div>
+
                 <div className="my-3 flex flex-col items-start justify-center gap-2">
                   <label htmlFor="ingredients" className="font-semibold">
                     Ingredients
@@ -172,10 +257,17 @@ const FoodModal = ({
                     id="ingredients"
                     className="w-full rounded-lg border border-orange-400 px-2 py-3"
                     placeholder="rice,oil,beans"
-                    value={selectedFood?.ingredients.join(",")}
-                    {...register("ingredients")}
+                    {...register("ingredients", {
+                      required: "At least one ingredient is required",
+                    })}
                   />
+                  {errors.ingredients && (
+                    <p className="text-sm text-red-600">
+                      {errors.ingredients.message as string}
+                    </p>
+                  )}
                 </div>
+
                 <button
                   type="submit"
                   className="mt-3 w-full rounded-lg bg-orange-400 py-4 text-center text-white hover:cursor-pointer hover:bg-orange-500 hover:shadow-md"

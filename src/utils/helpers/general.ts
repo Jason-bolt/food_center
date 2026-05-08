@@ -74,28 +74,15 @@ export const getWithExpiry = (key: string) => {
 export const uploadImage = async (
   image: File,
 ): Promise<{ image: string } | null> => {
-  try {
     const formData = new FormData();
     formData.append("image", image);
-
-    console.log("Uploading image:", image.name, image.size, "bytes");
 
     const response = await uploadImageRequest(formData);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Failed to upload image:", response.status, errorText);
-      throw new Error(`Upload failed: ${response.status}`);
+      throw new Error(`Upload failed: ${response.status} — ${errorText}`);
     }
 
-    const imageUrl = await response.json();
-    console.log("Image uploaded successfully:", imageUrl);
-    return imageUrl;
-  } catch (error) {
-    console.error(
-      "Error uploading image:",
-      error instanceof Error ? error.message : error,
-    );
-    throw error; // Re-throw to handle in createFood
-  }
+    return await response.json();
 };
