@@ -30,11 +30,21 @@ const FoodModal = ({
   selectedFood,
   deleteFood,
 }: FoodModalProps) => {
+  type FoodFormValues = {
+    name: string;
+    description: string;
+    culturalStory: string;
+    countries: string;
+    region: string;
+    ingredients: string;
+    image: FileList;
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<FoodFormValues>({
     defaultValues: selectedFood
       ? {
           name: selectedFood.name,
