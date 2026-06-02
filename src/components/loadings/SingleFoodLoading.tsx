@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const SingleFoodLoading = () => {
   return (
-    <section className="min-h-screen animate-pulse pt-2 lg:px-72">
+    <section className="min-h-screen animate-pulse pt-2 lg:px-40 xl:px-72">
       <Link
         to={"/"}
         className="my-5 flex max-w-28 items-center justify-start gap-2"
@@ -13,7 +13,7 @@ const SingleFoodLoading = () => {
       </Link>
       <div className="ball pointer-events-none fixed top-0 left-0 -z-10 h-15 w-15 rounded-full bg-purple-300"></div>
       <div className="flex flex-col items-center justify-center gap-5">
-        <div className="h-[730px] w-full rounded-xl bg-gray-200"></div>
+        <div className="h-[280px] w-full rounded-xl bg-gray-200 sm:h-[420px] lg:h-[600px]"></div>
         <div className="flex w-full flex-col items-start justify-center">
           <div className="flex w-full flex-col items-start">
             <h1 className="my-2 w-full" id="foodName">

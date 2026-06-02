@@ -104,7 +104,7 @@ const FoodCard = ({
           </p>
           <p className="text-xs">
             <span className="font-bold text-orange-400">Ingredients:</span>{" "}
-            <span className="text-white capitalize">
+            <span className="line-clamp-2 text-white capitalize">
               {food?.ingredients?.join(", ")}
             </span>
           </p>

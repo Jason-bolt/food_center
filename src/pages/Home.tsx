@@ -1,5 +1,6 @@
 import { useGSAP } from "@gsap/react";
 import FoodCardSection from "../components/FoodCardSection";
+import TrendingSection from "../components/TrendingSection";
 import gsap from "gsap";
 import apple from "../assets/ingredients/apple-svgrepo-com.svg";
 import banana from "../assets/ingredients/banana-svgrepo-com.svg";
@@ -22,6 +23,7 @@ import watermelon from "../assets/ingredients/watermelon-diet-svgrepo-com.svg";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { HomeIngredientAnimation } from "../types/homeScreen";
 import CountryRegionFilter from "../components/CountryRegionFilter";
+import EditorialBanner from "../components/EditorialBanner";
 import type { IFood } from "../types/food";
 import type { IPaginatedResponse } from "../types/general";
 import { useLocation } from "react-router-dom";
@@ -283,7 +285,9 @@ const Home = () => {
         </div>
       </section>
       <div ref={foodSectionRef}>
+        <EditorialBanner />
         <FoodCardSection foods={fetchedFoods} />
+        <TrendingSection />
       </div>
     </section>
   );

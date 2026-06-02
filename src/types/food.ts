@@ -19,6 +19,17 @@ export interface IFoodRequest {
   description: string;
 }
 
+export interface IEditorial {
+  _id: string;
+  title: string;
+  region: string;
+  description: string;
+  imageUrl: string | null;
+  featuredFoodIds: string[];
+  activeWeek: string; // ISO date string (Monday UTC)
+  createdAt: string;
+}
+
 export interface IFoodVideo {
   _id: string;
   influencer: {

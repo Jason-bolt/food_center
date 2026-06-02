@@ -153,7 +153,7 @@ const SingleFood = () => {
   }
 
   return (
-    <section className="min-h-screen pt-2 lg:px-72">
+    <section className="min-h-screen pt-2 lg:px-40 xl:px-72">
       <div className="ball pointer-events-none fixed top-0 left-0 h-15 w-15 rounded-full bg-purple-300"></div>
       <Link
         to={"/"}
@@ -171,7 +171,7 @@ const SingleFood = () => {
         <img
           src={fetchedFood?.imageUrl}
           alt="Food_image"
-          className="max-h-[700px] w-full rounded-xl object-cover object-center"
+          className="max-h-[280px] w-full rounded-xl object-cover object-center sm:max-h-[420px] lg:max-h-[600px]"
           id="foodImage"
         />
         <div className="flex w-full flex-col items-start justify-center">

@@ -27,7 +27,7 @@ const FoodVideoPlayer = ({
 
             <div className="mt-3 mb-3 w-full text-center">
               <iframe
-                className="h-96 w-full"
+                className="h-52 w-full sm:h-72 md:h-96"
                 src={`https://www.youtube.com/embed/${videoId}`}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

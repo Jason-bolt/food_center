@@ -176,14 +176,16 @@ const FoodVideos = () => {
 
   return (
     <section className="min-h-screen pt-2">
+      <div className="px-4 sm:px-6 lg:px-8">
       <Link
         to={`/foods/${id}`}
-        className="my-5 flex max-w-28 items-center justify-start gap-2 lg:ms-20"
+        className="my-5 inline-flex max-w-28 items-center justify-start gap-2"
       >
         <ArrowLeft width={20} />
         Back
       </Link>
-      <h1 className="mb-5 text-center text-3xl font-bold">
+      </div>
+      <h1 className="mb-3 px-4 text-center text-2xl font-bold sm:text-3xl">
         {fetchedFood?.name}
       </h1>
       <div className="flex items-center justify-center">
@@ -207,12 +209,12 @@ const FoodVideos = () => {
           />
         )}
       </div>
-      <div className="flex w-full flex-wrap items-start justify-center gap-7 mb-20">
+      <div className="mb-20 grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
         {!foodVideos.length && (
-          <div className="mt-30 min-h-screen text-center" ref={noVideoTextRef}>
-            <p className="my-7 text-5xl font-black" id="noVideoText1">No videos</p>
-            <p className="my-7 text-5xl font-black" id="noVideoText2">for this</p>
-            <p className="my-7 text-5xl font-black" id="noVideoText3">food / influencer</p>
+          <div className="col-span-full mt-20 text-center" ref={noVideoTextRef}>
+            <p className="my-5 text-4xl font-black sm:text-5xl" id="noVideoText1">No videos</p>
+            <p className="my-5 text-4xl font-black sm:text-5xl" id="noVideoText2">for this</p>
+            <p className="my-5 text-4xl font-black sm:text-5xl" id="noVideoText3">food / influencer</p>
           </div>
         )}
         {foodVideos.map((foodVideo: IFoodVideo) => (

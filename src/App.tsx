@@ -10,28 +10,53 @@ import AdminLayout from "./components/layout/AdminLayout";
 import AdminHome from "./pages/admin/AdminHome";
 import AdminGuard from "./components/AdminGuard";
 import AdminLogin from "./pages/admin/AdminLogin";
+import AIChefLayout from "./components/layout/AIChefLayout";
+import AIChef from "./pages/AIChef";
+import AuthProvider from "./contexts/AuthProvider";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import MyRecipes from "./pages/MyRecipes";
+import GuestGuard from "./components/GuestGuard";
+import MealPlanner from "./pages/MealPlanner";
+import Pantry from "./pages/Pantry";
+import Profile from "./pages/Profile";
+import StreakToast from "./components/StreakToast";
 
 function App() {
   return (
     <BrowserRouter>
-      <FoodSectionProvider>
-        <InitialLoadProvider>
-          <Routes>
-            <Route path="/" element={<RootLayout />}>
-              <Route index element={<Home />} />
-              <Route path="/foods/:id" element={<SingleFood />} />
-              <Route path="/foods/:id/videos" element={<FoodVideos />} />
-            </Route>
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminGuard />}>
-              <Route element={<AdminLayout />}>
-                <Route index element={<AdminHome />} />
+      <AuthProvider>
+        <FoodSectionProvider>
+          <InitialLoadProvider>
+            <StreakToast />
+            <Routes>
+              <Route path="/" element={<RootLayout />}>
+                <Route index element={<Home />} />
+                <Route path="/foods/:id" element={<SingleFood />} />
+                <Route path="/foods/:id/videos" element={<FoodVideos />} />
+                <Route element={<GuestGuard />}>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                </Route>
+                <Route path="/my-recipes" element={<MyRecipes />} />
+                <Route path="/meal-planner" element={<MealPlanner />} />
+                <Route path="/pantry" element={<Pantry />} />
+                <Route path="/profile" element={<Profile />} />
               </Route>
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </InitialLoadProvider>
-      </FoodSectionProvider>
+              <Route path="/ai" element={<AIChefLayout />}>
+                <Route index element={<AIChef />} />
+              </Route>
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin" element={<AdminGuard />}>
+                <Route element={<AdminLayout />}>
+                  <Route index element={<AdminHome />} />
+                </Route>
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </InitialLoadProvider>
+        </FoodSectionProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
