@@ -55,10 +55,13 @@ export const deleteFoodRequest = async (
 };
 
 // ########## RECIPE REQUESTS ##########
-export const suggestRecipes = async (ingredients: string[]): Promise<Response> => {
+export const suggestRecipes = async (ingredients: string[], token?: string | null): Promise<Response> => {
   return fetch(`${import.meta.env.VITE_SERVER_BASE_URL}/recipes/suggest`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify({ ingredients }),
   });
 };
@@ -295,6 +298,35 @@ export const deleteEditorial = async (id: string): Promise<void> => {
     headers: authHeaders(),
   });
   if (!res.ok) throw new Error("Failed to delete editorial");
+};
+
+// ########## BILLING REQUESTS ##########
+
+export const createCheckoutSession = async (token: string): Promise<{ url: string }> => {
+  const res = await fetch(`${BASE}/billing/checkout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeader(token) },
+  });
+  if (!res.ok) throw new Error("Failed to start checkout");
+  return res.json();
+};
+
+export const createCreditsCheckout = async (token: string): Promise<{ url: string }> => {
+  const res = await fetch(`${BASE}/billing/credits`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeader(token) },
+  });
+  if (!res.ok) throw new Error("Failed to start credits checkout");
+  return res.json();
+};
+
+export const createPortalSession = async (token: string): Promise<{ url: string }> => {
+  const res = await fetch(`${BASE}/billing/portal`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeader(token) },
+  });
+  if (!res.ok) throw new Error("Failed to open billing portal");
+  return res.json();
 };
 
 // ########## GENERAL REQUESTS ##########

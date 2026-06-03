@@ -10,11 +10,12 @@ export interface UserStats {
 }
 
 export interface AuthUser {
-  _id:   string;
-  name:  string;
-  email: string;
-  plan:  "free" | "pro";
-  stats: UserStats;
+  _id:     string;
+  name:    string;
+  email:   string;
+  plan:    "free" | "pro";
+  credits: number;
+  stats:   UserStats;
 }
 
 export interface StreakToast {

@@ -21,6 +21,8 @@ import MealPlanner from "./pages/MealPlanner";
 import Pantry from "./pages/Pantry";
 import Profile from "./pages/Profile";
 import StreakToast from "./components/StreakToast";
+import Pricing from "./pages/Pricing";
+import UpgradeSuccess from "./pages/UpgradeSuccess";
 
 function App() {
   return (
@@ -42,6 +44,8 @@ function App() {
                 <Route path="/meal-planner" element={<MealPlanner />} />
                 <Route path="/pantry" element={<Pantry />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/upgrade/success" element={<UpgradeSuccess />} />
               </Route>
               <Route path="/ai" element={<AIChefLayout />}>
                 <Route index element={<AIChef />} />
