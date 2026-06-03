@@ -11,9 +11,10 @@ const buildStreakToast = (user: AuthUser): StreakToast | null => {
   return { streak, xp: user.stats?.xp ?? 0 };
 };
 
-/** Ensures stats always exists even for legacy user documents. */
-const normalise = (raw: Omit<AuthUser, "stats"> & { stats?: Partial<AuthUser["stats"]> }): AuthUser => ({
+/** Ensures stats and credits always exist even for legacy user documents. */
+const normalise = (raw: Omit<AuthUser, "stats" | "credits"> & { credits?: number; stats?: Partial<AuthUser["stats"]> }): AuthUser => ({
   ...raw,
+  credits: raw.credits ?? 0,
   stats: { ...defaultStats, ...(raw.stats ?? {}) },
 });
 

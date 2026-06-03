@@ -1,6 +1,6 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Search, X, LogOut, BookMarked, ChevronDown, User, Menu, CalendarDays, Flame, Star, UtensilsCrossed, BarChart2 } from "lucide-react";
+import { Search, X, LogOut, BookMarked, ChevronDown, User, Menu, CalendarDays, Flame, Star, UtensilsCrossed, BarChart2, Sparkles, Coins } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -207,6 +207,11 @@ const Navbar = ({ basePath = "/" }: NavbarProps) => {
                           <span className="flex items-center gap-1 rounded-full bg-yellow-50 px-2 py-0.5 text-xs font-semibold text-yellow-600">
                             <Star size={10} fill="currentColor" /> {user.stats?.xp ?? 0} XP
                           </span>
+                          {(user.credits ?? 0) > 0 && (
+                            <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-600">
+                              <Coins size={10} /> {user.credits}cr
+                            </span>
+                          )}
                         </div>
                       </div>
                       <Link
@@ -237,6 +242,20 @@ const Navbar = ({ basePath = "/" }: NavbarProps) => {
                       >
                         <BarChart2 size={14} /> My Stats
                       </Link>
+                      {user.plan === "free" && (
+                        <Link
+                          to="/pricing"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-orange-500 hover:cursor-pointer hover:bg-orange-50"
+                        >
+                          <Sparkles size={14} /> Upgrade to Pro
+                        </Link>
+                      )}
+                      {user.plan === "pro" && (
+                        <div className="mx-4 my-1 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-3 py-1 text-xs font-bold text-white">
+                          <Sparkles size={10} /> Pro Plan
+                        </div>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:cursor-pointer hover:bg-red-50"

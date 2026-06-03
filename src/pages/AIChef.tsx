@@ -9,6 +9,7 @@ import { generateRecipeImages, suggestRecipes, getPantry } from "../utils/helper
 import RecipePDFDownload from "../components/RecipePDF";
 import SaveRecipeModal from "../components/SaveRecipeModal";
 import { AuthContext } from "../contexts/AuthContext";
+import UpgradeModal from "../components/UpgradeModal";
 
 const EDGE_POSITIONS = [
   "top-[18%] left-[6%]",
@@ -100,6 +101,9 @@ const AIChef = () => {
   // Save recipe modal
   const [savingRecipe, setSavingRecipe] = useState<RecipeBlock | null>(null);
   const [savedTitles, setSavedTitles] = useState<Set<string>>(new Set());
+
+  // Upgrade modal
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Pantry
   const [pantryLoading, setPantryLoading] = useState(false);
@@ -234,7 +238,20 @@ const AIChef = () => {
     let fullText = "";
 
     try {
-      const response = await suggestRecipes(ingredients);
+      const response = await suggestRecipes(ingredients, token);
+
+      // Free-tier daily cap hit
+      if (response.status === 429) {
+        const body = await response.json().catch(() => ({})) as { error?: string };
+        if (body.error === "daily_limit_reached") {
+          setIsStreaming(false);
+          setPhase("idle");
+          setShowUpgradeModal(true);
+          return;
+        }
+        throw new Error("Too many requests. Please wait a moment.");
+      }
+
       if (!response.ok || !response.body) throw new Error("Failed to reach the recipe service.");
 
       const reader = response.body.getReader();
@@ -314,6 +331,8 @@ const AIChef = () => {
 
   return (
     <>
+      {showUpgradeModal && <UpgradeModal onClose={() => setShowUpgradeModal(false)} />}
+
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
