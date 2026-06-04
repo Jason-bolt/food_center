@@ -5,6 +5,7 @@ import type { IFood, IFoodRequest } from "../../types/food";
 import { useLocation, useSearchParams } from "react-router-dom";
 import AdminFoodCardSection from "../../components/admin/AdminFoodCardSection";
 import EditorialPanel from "../../components/admin/EditorialPanel";
+import FeaturedSlotsPanel from "../../components/admin/FeaturedSlotsPanel";
 import FoodModal from "./FoodModal";
 import { uploadImage } from "../../utils/helpers/general";
 import {
@@ -181,6 +182,7 @@ const AdminHome = () => {
 
   return (
     <section className="min-h-screen pt-2">
+      <FeaturedSlotsPanel />
       <EditorialPanel />
       <CountryRegionFilter className="countryRegionFilter" />
 

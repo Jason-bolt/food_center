@@ -1,6 +1,6 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { ChevronDown, X, Sparkles, RotateCcw, ImageIcon, Bookmark, BookmarkCheck, UtensilsCrossed } from "lucide-react";
+import { ChevronDown, X, Sparkles, RotateCcw, ImageIcon, Bookmark, BookmarkCheck, UtensilsCrossed, Crown, Lock } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
@@ -26,10 +26,11 @@ interface RecipeBlock {
   markdown: string;
   imageUrl: string | null;
   imageLoading: boolean;
+  isPremium: boolean;
 }
 
 // Parses "## Recipe Name • Region\n..." blocks out of the streamed markdown
-const parseRecipeBlocks = (text: string): RecipeBlock[] => {
+const parseRecipeBlocks = (text: string, isPremium: boolean): RecipeBlock[] => {
   const blocks = text.split(/(?=^## )/m).filter((s) => s.trim());
   return blocks.map((block) => {
     const firstLine = block.split("\n")[0];
@@ -40,6 +41,7 @@ const parseRecipeBlocks = (text: string): RecipeBlock[] => {
       markdown: block.replace(/\n---\s*$/m, "").trim(),
       imageUrl: null,
       imageLoading: true,
+      isPremium,
     };
   });
 };
@@ -97,6 +99,7 @@ const AIChef = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState("");
   const [recipeBlocks, setRecipeBlocks] = useState<RecipeBlock[]>([]);
+  const [recipeMode, setRecipeMode] = useState<"standard" | "premium">("standard");
 
   // Save recipe modal
   const [savingRecipe, setSavingRecipe] = useState<RecipeBlock | null>(null);
@@ -236,6 +239,7 @@ const AIChef = () => {
     setIsStreaming(true);
 
     let fullText = "";
+    let streamIsPremium = false;
 
     try {
       const response = await suggestRecipes(ingredients, token);
@@ -271,9 +275,13 @@ const AIChef = () => {
           const raw = line.slice(6).trim();
           if (raw === "[DONE]") break;
           try {
-            const parsed = JSON.parse(raw) as { text?: string; error?: string };
-            if (parsed.error) setStreamError(parsed.error);
-            else if (parsed.text) {
+            const parsed = JSON.parse(raw) as { text?: string; error?: string; mode?: string };
+            if (parsed.mode) {
+              streamIsPremium = parsed.mode === "premium";
+              setRecipeMode(parsed.mode === "premium" ? "premium" : "standard");
+            } else if (parsed.error) {
+              setStreamError(parsed.error);
+            } else if (parsed.text) {
               fullText += parsed.text;
               setStreamedText(fullText);
             }
@@ -293,7 +301,7 @@ const AIChef = () => {
     // Refresh user stats so navbar streak/XP badge reflects the new generate event
     if (user) refreshUser();
 
-    const blocks = parseRecipeBlocks(fullText);
+    const blocks = parseRecipeBlocks(fullText, streamIsPremium);
     setRecipeBlocks(blocks);
 
     if (blocks.length === 0) return;
@@ -325,6 +333,7 @@ const AIChef = () => {
     setIngredients([]);
     setInputValue("");
     setSavedTitles(new Set());
+    setRecipeMode("standard");
   };
 
   const centerFood = allFoods[centerFoodIndex];
@@ -526,13 +535,18 @@ const AIChef = () => {
                       alt={block.title}
                       className="aspect-[4/3] w-full object-cover"
                     />
-                  ) : (
-                    /* Image failed silently — show nothing */
-                    null
-                  )}
+                  ) : null}
 
                   {/* Recipe text */}
                   <div className="p-6 text-sm text-gray-700">
+                    {/* Premium badge */}
+                    {block.isPremium && (
+                      <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-3 py-1 text-xs font-bold text-white shadow-sm">
+                        <Crown size={11} />
+                        Premium Recipe
+                      </div>
+                    )}
+
                     <ReactMarkdown components={MarkdownComponents}>
                       {block.markdown}
                     </ReactMarkdown>
@@ -567,6 +581,49 @@ const AIChef = () => {
                   </div>
                 </div>
               ))}
+
+              {/* Premium teaser for free/guest users */}
+              {recipeMode === "standard" && (
+                <div className="relative overflow-hidden rounded-3xl border border-orange-100 bg-white shadow-sm">
+                  {/* Blurred content preview */}
+                  <div className="select-none blur-sm pointer-events-none p-6 text-sm text-gray-700 space-y-3">
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 px-3 py-1 text-xs font-bold text-white">
+                      <Crown size={11} /> Premium Recipe
+                    </div>
+                    <div className="h-5 w-2/3 rounded bg-gray-200" />
+                    <div className="space-y-2">
+                      <div className="h-3 w-full rounded bg-gray-100" />
+                      <div className="h-3 w-5/6 rounded bg-gray-100" />
+                      <div className="h-3 w-4/6 rounded bg-gray-100" />
+                    </div>
+                    <div className="h-3 w-1/2 rounded bg-gray-100" />
+                    <div className="space-y-1.5">
+                      {[...Array(4)].map((_, i) => (
+                        <div key={i} className="h-3 rounded bg-gray-100" style={{ width: `${85 - i * 8}%` }} />
+                      ))}
+                    </div>
+                    <div className="h-3 w-3/4 rounded bg-amber-100" />
+                    <div className="h-3 w-2/3 rounded bg-gray-100" />
+                  </div>
+
+                  {/* Lock overlay */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[2px] p-6 text-center">
+                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-200">
+                      <Lock size={20} />
+                    </div>
+                    <p className="mb-1 text-base font-black text-gray-900">Unlock Premium Recipes</p>
+                    <p className="mb-4 text-sm text-gray-500">
+                      Pro recipes include chef's tips, plating guides, drink pairings, and nutritional info.
+                    </p>
+                    <a
+                      href="/pricing"
+                      className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-orange-200 transition-opacity hover:opacity-90"
+                    >
+                      <Crown size={14} /> Upgrade to Pro — $4.99/mo
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -1,28 +1,35 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from "react";
+
+// ─── Eagerly loaded — part of the critical first paint ───────────────────────
 import Home from "./pages/Home";
 import RootLayout from "./components/layout/RootLayout";
-import SingleFood from "./pages/SingleFood";
-import FoodVideos from "./pages/FoodVideos";
 import NotFound from "./pages/NotFound";
 import FoodSectionProvider from "./contexts/FoodSectionProvider";
 import InitialLoadProvider from "./contexts/InitialLoadProvider";
-import AdminLayout from "./components/layout/AdminLayout";
-import AdminHome from "./pages/admin/AdminHome";
 import AdminGuard from "./components/AdminGuard";
-import AdminLogin from "./pages/admin/AdminLogin";
 import AIChefLayout from "./components/layout/AIChefLayout";
-import AIChef from "./pages/AIChef";
 import AuthProvider from "./contexts/AuthProvider";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import MyRecipes from "./pages/MyRecipes";
 import GuestGuard from "./components/GuestGuard";
-import MealPlanner from "./pages/MealPlanner";
-import Pantry from "./pages/Pantry";
-import Profile from "./pages/Profile";
 import StreakToast from "./components/StreakToast";
 import Pricing from "./pages/Pricing";
 import UpgradeSuccess from "./pages/UpgradeSuccess";
+
+// ─── Lazily loaded — split into separate chunks ───────────────────────────────
+const SingleFood     = lazy(() => import("./pages/SingleFood"));
+const FoodVideos     = lazy(() => import("./pages/FoodVideos"));
+const Login          = lazy(() => import("./pages/Login"));
+const Register       = lazy(() => import("./pages/Register"));
+const MyRecipes      = lazy(() => import("./pages/MyRecipes"));
+const MealPlanner    = lazy(() => import("./pages/MealPlanner"));
+const Pantry         = lazy(() => import("./pages/Pantry"));
+const Profile        = lazy(() => import("./pages/Profile"));
+const Pricing        = lazy(() => import("./pages/Pricing"));
+const UpgradeSuccess = lazy(() => import("./pages/UpgradeSuccess"));
+const AIChef         = lazy(() => import("./pages/AIChef"));
+const AdminLayout    = lazy(() => import("./components/layout/AdminLayout"));
+const AdminHome      = lazy(() => import("./pages/admin/AdminHome"));
+const AdminLogin     = lazy(() => import("./pages/admin/AdminLogin"));
 
 function App() {
   return (
@@ -31,6 +38,7 @@ function App() {
         <FoodSectionProvider>
           <InitialLoadProvider>
             <StreakToast />
+            <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<RootLayout />}>
                 <Route index element={<Home />} />
@@ -58,6 +66,7 @@ function App() {
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
           </InitialLoadProvider>
         </FoodSectionProvider>
       </AuthProvider>

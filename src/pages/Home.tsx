@@ -24,6 +24,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { HomeIngredientAnimation } from "../types/homeScreen";
 import CountryRegionFilter from "../components/CountryRegionFilter";
 import EditorialBanner from "../components/EditorialBanner";
+import FeaturedInfluencerBanner from "../components/FeaturedInfluencerBanner";
 import type { IFood } from "../types/food";
 import type { IPaginatedResponse } from "../types/general";
 import { useLocation } from "react-router-dom";
@@ -286,6 +287,7 @@ const Home = () => {
       </section>
       <div ref={foodSectionRef}>
         <EditorialBanner />
+        <FeaturedInfluencerBanner />
         <FoodCardSection foods={fetchedFoods} />
         <TrendingSection />
       </div>
