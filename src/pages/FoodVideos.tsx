@@ -5,7 +5,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import FoodVideoCard from "../components/FoodVideoCard";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import FoodVideoPlayer from "../components/FoodVideoPlayer";
@@ -31,6 +31,10 @@ const FoodVideos = () => {
   const [fetchedFood, setFetchedFood] = useState<IFood>();
   const [searchParams, setSearchParams] = useSearchParams();
   const newSearchParams = new URLSearchParams(searchParams);
+
+  // Featured inquiry form
+  const [inquiry, setInquiry] = useState({ name: "", email: "", message: "" });
+  const [inquiryState, setInquiryState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const selectInfluencerModalBackgroundRef = useRef<HTMLDivElement>(null);
   const selectInfluencerModalRef = useRef<HTMLDivElement>(null);
   const selectInfluencerButtonRef = useRef<HTMLButtonElement>(null);
@@ -240,6 +244,68 @@ const FoodVideos = () => {
           toggleVideoPlayer={toggleVideoPlayer}
         />
       )}
+
+      {/* ── Featured creator inquiry ─────────────────────────────────────────── */}
+      <div className="mx-auto max-w-xl px-4 pb-16 pt-4 sm:px-6">
+        <div className="rounded-3xl border border-orange-100 bg-orange-50 p-8 text-center">
+          <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-orange-500">
+            <Sparkles size={22} />
+          </div>
+          <h3 className="mb-1 text-lg font-black text-gray-900">Want to be featured?</h3>
+          <p className="mb-6 text-sm text-gray-500">
+            Are you a food creator or influencer? Get in touch and we'll put your content in front of our audience.
+          </p>
+
+          {inquiryState === "sent" ? (
+            <div className="rounded-2xl bg-green-50 px-6 py-4 text-sm font-semibold text-green-600">
+              ✓ Inquiry received! We'll be in touch soon.
+            </div>
+          ) : (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setInquiryState("sending");
+                try {
+                  const r = await fetch(`${import.meta.env.VITE_SERVER_BASE_URL}/influencers/inquiry`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(inquiry),
+                  });
+                  setInquiryState(r.ok ? "sent" : "error");
+                } catch {
+                  setInquiryState("error");
+                }
+              }}
+              className="space-y-3 text-left"
+            >
+              <input
+                type="text" required placeholder="Your name"
+                value={inquiry.name} onChange={(e) => setInquiry((p) => ({ ...p, name: e.target.value }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              />
+              <input
+                type="email" required placeholder="Your email"
+                value={inquiry.email} onChange={(e) => setInquiry((p) => ({ ...p, email: e.target.value }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+              />
+              <textarea
+                required rows={3} placeholder="Tell us about yourself and your content…"
+                value={inquiry.message} onChange={(e) => setInquiry((p) => ({ ...p, message: e.target.value }))}
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 resize-none"
+              />
+              {inquiryState === "error" && (
+                <p className="text-xs text-red-500">Something went wrong. Please try again.</p>
+              )}
+              <button
+                type="submit" disabled={inquiryState === "sending"}
+                className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-amber-400 py-3 font-bold text-white shadow-md shadow-orange-200 transition-opacity hover:opacity-90 disabled:opacity-60"
+              >
+                {inquiryState === "sending" ? "Sending…" : "Get in touch"}
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
     </section>
   );
 };
