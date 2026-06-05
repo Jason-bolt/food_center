@@ -148,7 +148,7 @@ const Navbar = ({ basePath = "/" }: NavbarProps) => {
           {isAdmin ? (
             <span className="text-orange-600"> - ADMIN</span>
           ) : (
-            <span className="hidden text-sm text-orange-600 sm:inline">&nbsp;(AFRICA)</span>
+            <span className="hidden text-sm text-orange-600 sm:inline"></span>
           )}
         </Link>
 
