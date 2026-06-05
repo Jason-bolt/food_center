@@ -1,6 +1,6 @@
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { Search, X, LogOut, BookMarked, ChevronDown, User, Menu, CalendarDays, Flame, Star, UtensilsCrossed, BarChart2, Sparkles, Coins } from "lucide-react";
+import { Search, X, LogOut, BookMarked, ChevronDown, User, Menu, CalendarDays, Flame, Star, UtensilsCrossed, BarChart2, Sparkles, Coins, Code2 } from "lucide-react";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   Link,
@@ -148,7 +148,7 @@ const Navbar = ({ basePath = "/" }: NavbarProps) => {
           {isAdmin ? (
             <span className="text-orange-600"> - ADMIN</span>
           ) : (
-            <span className="hidden text-sm text-orange-600 sm:inline">&nbsp;(AFRICA)</span>
+            <span className="hidden text-sm text-orange-600 sm:inline"></span>
           )}
         </Link>
 
@@ -241,6 +241,13 @@ const Navbar = ({ basePath = "/" }: NavbarProps) => {
                         className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
                       >
                         <BarChart2 size={14} /> My Stats
+                      </Link>
+                      <Link
+                        to="/developer"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:cursor-pointer hover:bg-gray-50"
+                      >
+                        <Code2 size={14} /> Developer API
                       </Link>
                       {user.plan === "free" && (
                         <Link
