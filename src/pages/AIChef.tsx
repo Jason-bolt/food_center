@@ -559,6 +559,7 @@ const AIChef = () => {
                           region={block.region}
                           imageUrl={block.imageUrl}
                           markdown={block.markdown}
+                          onNeedUpgrade={() => setShowUpgradeModal(true)}
                         />
                         <button
                           onClick={() => {

@@ -311,6 +311,16 @@ export const createCheckoutSession = async (token: string): Promise<{ url: strin
   return res.json();
 };
 
+export const authorisePdfDownload = async (token: string): Promise<{ allowed: boolean; creditsUsed: number; creditsRemaining?: number }> => {
+  const res = await fetch(`${BASE}/billing/pdf-download`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeader(token) },
+  });
+  if (res.status === 402) return { allowed: false, creditsUsed: 0 };
+  if (!res.ok) throw new Error("Auth check failed");
+  return res.json();
+};
+
 export const createCreditsCheckout = async (token: string): Promise<{ url: string }> => {
   const res = await fetch(`${BASE}/billing/credits`, {
     method: "POST",
